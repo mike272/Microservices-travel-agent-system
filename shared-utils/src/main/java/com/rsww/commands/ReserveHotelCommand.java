@@ -1,6 +1,7 @@
 package com.rsww.commands;
 
 import java.util.Date;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,12 +17,11 @@ public class ReserveHotelCommand
 {
     private int tripReservationId;
     private int hotelId;
-    private int roomId;
+    private List<Integer> roomIds;
     private int numOfAdults;
     private int numOfChildren;
     private int numOfInfants;
     private Date checkInDate;
     private Date checkOutDate;
-    private String customerName;
     private int customerId;
 }
