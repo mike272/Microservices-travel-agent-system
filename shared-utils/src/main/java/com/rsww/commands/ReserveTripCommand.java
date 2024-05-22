@@ -1,6 +1,7 @@
 package com.rsww.commands;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 import lombok.AllArgsConstructor;
@@ -19,7 +20,7 @@ public class ReserveTripCommand
     private int tripId;
 
     private int hotelId;
-    private int roomId;
+    private List<Integer> roomIds;
     private int numOfAdults;
     private int numOfChildren;
     private int numOfInfants;
