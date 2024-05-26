@@ -31,6 +31,7 @@ dependencies {
 	implementation files('..\\shared-utils\\build\\libs\\shared-utils-0.1-SNAPSHOT.jar')
 	implementation 'org.axonframework:axon-spring-boot-starter:+'
 	implementation 'org.axonframework:axon-test:+'
+	implementation 'com.opencsv:opencsv:+'
 }
 
 tasks.named('test') {
