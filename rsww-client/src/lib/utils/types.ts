@@ -11,6 +11,11 @@ type Trip = {
 type Hotel = {
   id: number;
   name: string;
+  stars: number;
+  about: string;
+  areKidsAllowed: boolean;
+  rooms: number;
+  city: string;
   description: string;
   location: string;
   fromDate: string;

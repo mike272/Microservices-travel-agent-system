@@ -1,11 +1,7 @@
+import { Hotel } from "@/lib/utils/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-interface Hotel {
-  id: number;
-  location: string;
-  description: string;
-  name: string;
-}
+
 
 interface HotelsState {
   hotels: Hotel[];
