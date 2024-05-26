@@ -1,6 +1,10 @@
+package com.rsww.transport_service.axon;
+
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.eventhandling.gateway.EventGateway;
 import org.springframework.stereotype.Service;
+
+import com.rsww.transport_service.transport.TransportService;
 
 
 @Service

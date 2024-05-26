@@ -27,9 +27,9 @@ public class Transport
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private String city;
+    private String departureCity;
+    private String destinationCity;
     private Date departureDate;
-    private Date returnDate;
     private TransportTypeEnum transportType;
     private int basePrice;
     private int totalPlaces;

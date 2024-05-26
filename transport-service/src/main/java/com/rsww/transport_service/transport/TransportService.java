@@ -8,11 +8,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.axonframework.eventhandling.gateway.EventGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
+import com.rsww.events.HotelsInitializedEvent;
+import com.rsww.events.TransportsInitializedEvent;
 
 
 @Service
@@ -20,10 +23,12 @@ public class TransportService
 {
 
     private final TransportRepository transportRepository;
+    private final EventGateway eventGateway;
 
     @Autowired
-    public TransportService(final TransportRepository transportRepository) {
+    public TransportService(final TransportRepository transportRepository, final EventGateway eventGateway) {
         this.transportRepository = transportRepository;
+        this.eventGateway = eventGateway;
     }
 
     public List<Transport> findAvailableTransports(final String departureLocation, final String arrivalLocation, final Date departureDate, final Integer numberOfPeople) {
@@ -47,12 +52,12 @@ public class TransportService
             .withIgnoreLeadingWhiteSpace(true)
             .build();
 
-        final List<Transport> hotels = csvToBean.parse();
-        final List<Transport> hotelsSubList = hotels.subList(0, Math.min(10, hotels.size()));
+        final List<Transport> transports = csvToBean.parse();
+        final List<Transport> transportsSubList = transports.subList(0, Math.min(10, transports.size()));
 
-        transportRepository.saveAll(hotelsSubList);
-        return hotelsSubList.stream().map(this::mapToDtoTransport).collect(Collectors.toList());
+        transportRepository.saveAll(transportsSubList);
+        final var transportsList = transportsSubList.stream().map(this::mapToDtoTransport).toList();
+        eventGateway.publish(TransportsInitializedEvent.builder().withTransports(transportsList).build());
+        return transportsList;
     }
-
-
 }

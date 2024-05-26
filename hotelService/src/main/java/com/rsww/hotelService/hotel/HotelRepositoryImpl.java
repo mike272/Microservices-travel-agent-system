@@ -30,9 +30,9 @@ public class HotelRepositoryImpl implements HotelRepository
         entityManager
             .persist(Hotel
                 .builder()
-                .withCity("Test")
-                .withName("Test")
-                .withDescription("Test description")
+                .withCity(entity.getCity())
+                .withName(entity.getName())
+                .withDescription(entity.getDescription())
                 .build());
         return null;
     }
@@ -40,6 +40,16 @@ public class HotelRepositoryImpl implements HotelRepository
     @Override
     public <S extends Hotel> Iterable<S> saveAll(final Iterable<S> entities)
     {
+        entities.forEach(entity->entityManager.persist(
+            Hotel.builder()
+                .withCity(entity.getCity())
+                .withAreChildrenAllowed(entity.isAreChildrenAllowed())
+                .withCountry(entity.getCountry())
+                .withName(entity.getName())
+                .withDescription(entity.getDescription())
+                .withStarsNum(entity.getStarsNum())
+                .build()
+        ));
         return null;
     }
 

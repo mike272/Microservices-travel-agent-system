@@ -8,6 +8,7 @@ import org.axonframework.eventhandling.gateway.EventGateway;
 import org.springframework.stereotype.Service;
 
 import com.rsww.commands.InitializeHotels;
+import com.rsww.commands.InitializeTransportsCommand;
 import com.rsww.transport_service.transport.TransportService;
 
 
@@ -25,7 +26,7 @@ public class TransportCommandHandler{
     }
 
     @CommandHandler
-    public void handle(final InitializeHotels command) throws IOException
+    public void handle(final InitializeTransportsCommand command) throws IOException
     {
         transportService.initializeTransports();
     }

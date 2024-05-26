@@ -8,23 +8,27 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.axonframework.eventhandling.gateway.EventGateway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 import com.rsww.dto.ReservationEventType;
+import com.rsww.events.HotelsInitializedEvent;
 
 
 @Service
 public class HotelService
 {
     private final HotelRepositoryImpl hotelRepository;
+    private final EventGateway eventGateway;
 
     @Autowired
-    public HotelService(final HotelRepositoryImpl hotelRepository)
+    public HotelService(final HotelRepositoryImpl hotelRepository, final EventGateway eventGateway)
     {
         this.hotelRepository = hotelRepository;
+        this.eventGateway = eventGateway;
     }
 
     public com.rsww.dto.Hotel mapToDtoHotel(final Hotel hotelEntity) {
@@ -58,6 +62,8 @@ public class HotelService
         final List<Hotel> hotelsSubList = hotels.subList(0, Math.min(10, hotels.size()));
 
         hotelRepository.saveAll(hotelsSubList);
-        return hotelsSubList.stream().map(this::mapToDtoHotel).collect(Collectors.toList());
+        final var hotelsList = hotelsSubList.stream().map(this::mapToDtoHotel).toList();
+        eventGateway.publish(HotelsInitializedEvent.builder().withHotels(hotelsList).build());
+        return hotelsList;
     }
 }
