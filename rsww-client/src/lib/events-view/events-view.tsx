@@ -8,7 +8,7 @@ const EventsView = () => {
 
   useEffect(() => {
     const socket = new WebSocket(
-      process.env.API_GATEWAY_ADDRESS + "/subscribe"
+      process.env.API_GATEWAY_ADDRESS + "/websocket"
     );
 
     socket.onmessage = (event) => {
