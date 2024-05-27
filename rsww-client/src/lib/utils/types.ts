@@ -40,4 +40,9 @@ type Transportation = {
   image: string;
 };
 
-export type { Trip, Hotel, Transportation };
+type EventType = {
+  message: string;
+  type: 'INFO' | 'SUCCESS' | 'ERROR' | 'WARNING';
+};
+
+export type { Trip, Hotel, Transportation, EventType };
