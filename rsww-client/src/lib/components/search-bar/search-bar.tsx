@@ -11,6 +11,7 @@ import { TwoLevelDatePicker } from "./two-level-date-picker";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { setHotels } from "@/lib/redux/reducers/hotelsReducer";
+import { Button, InputNumber, Modal } from "antd";
 type Props = {
   setTripsData: (data: any) => void;
   setHotelsData: (data: any) => void;
@@ -25,6 +26,20 @@ export const SearchBar = (props: Props) => {
 
   const [fromDate, setFromDate] = useState<undefined | string>(undefined);
   const [toDate, setToDate] = useState<undefined | string>(undefined);
+  const [guests, setGuests] = useState({ adults: 0, children: 0, infants: 0 });
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleOk = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
 
   async function onClick() {
     // let data = await searchTrips(fromState, toState, fromDate, toDate, {
@@ -32,7 +47,7 @@ export const SearchBar = (props: Props) => {
     //   children: 0,
     //   infants: 0,
     // });
-    let data = await searchHotels(fromState, fromDate, toDate, 3);
+    let data = await searchHotels(fromState, fromDate, toDate, guests);
     let hotels = data?.hotels ?? [];
     // setTripsData(data);
     console.log(hotels);
@@ -71,6 +86,41 @@ export const SearchBar = (props: Props) => {
           setToDate(dateString);
         }}
       />
+      <Button
+        className="bg-blue-500 hover:bg-blue-700 text-black font-bold px-4 rounded"
+        onClick={showModal}
+      >
+        Guests
+      </Button>
+      <Modal
+        title="Guests"
+        open={isModalVisible}
+        okButtonProps={{
+          className:
+            "bg-blue-500 hover:bg-blue-700 text-white font-bold px-4 rounded",
+        }}
+        onOk={handleOk}
+        onCancel={handleCancel}
+      >
+        <p>Adults</p>
+        <InputNumber
+          min={0}
+          value={guests.adults}
+          onChange={(value) => setGuests({ ...guests, adults: value })}
+        />
+        <p>Children</p>
+        <InputNumber
+          min={0}
+          value={guests.children}
+          onChange={(value) => setGuests({ ...guests, children: value })}
+        />
+        <p>Infants</p>
+        <InputNumber
+          min={0}
+          value={guests.infants}
+          onChange={(value) => setGuests({ ...guests, infants: value })}
+        />
+      </Modal>
       <SearchButton onClick={onClick} />
     </div>
   );

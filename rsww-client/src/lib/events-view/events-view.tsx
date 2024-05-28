@@ -4,7 +4,7 @@ import { EventType } from "../utils/types";
 
 const EventsView = () => {
   const [events, setEvents] = useState<EventType[]>([]);
-  const [isToggled, setIsToggled] = useState(false);
+  const [isToggled, setIsToggled] = useState(true);
 
   useEffect(() => {
     const socket = new WebSocket(
@@ -30,32 +30,59 @@ const EventsView = () => {
     };
   }, []);
 
-  return (
-    <div
-      style={{
-        backgroundColor: "green",
-        width: isToggled ? "300px" : "0",
-        height: "100vh",
-        overflowY: "scroll",
-        position: "relative",
-        flex: "0 0 auto",
-      }}
-    >
-      <Button
-        type="primary"
-        onClick={() => setIsToggled(!isToggled)}
-        style={{ position: "absolute", left: 0 }}
+  function EventRow({ type, message }: EventType) {
+    return (
+      <div
+        style={{
+          backgroundColor: getBackgroundColor(type),
+          color: "black",
+          borderRadius: "10px",
+          boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
+          padding: "10px",
+          margin: "10px 0",
+        }}
       >
-        {isToggled ? ">>" : "<<"}
-      </Button>
-      {isToggled &&
-        events.map((event, index) => (
-          <div key={index} style={{ color: getColor(event.type) }}>
-            {event.message}
-          </div>
-        ))}
-    </div>
-  );
+        {message}
+      </div>
+    );
+  }
+
+  function ToggledView() {
+    return (
+      <div
+        style={{
+          width: "300px",
+          height: "100vh",
+          overflowY: "scroll",
+          position: "relative",
+          flex: "0 0 auto",
+          borderLeft: "1px solid grey",
+        }}
+      >
+        <Button
+          type="primary"
+          onClick={() => setIsToggled(false)}
+          style={{ position: "absolute", right: 0, top: "166px" }}
+        >
+          {isToggled ? ">>" : "<<"}
+        </Button>
+        {isToggled &&
+          events.map((event, index) => (
+            <EventRow key={index} type={event.type} message={event.message} />
+          ))}
+      </div>
+    );
+  }
+
+  function HiddenView() {
+    return (
+      <div className="absolute w-10 h-10 top-40 right-0">
+        <Button onClick={() => setIsToggled(true)}>{"<<"}</Button>
+      </div>
+    );
+  }
+
+  return isToggled ? <ToggledView /> : <HiddenView />;
 };
 
 function getColor(type: "INFO" | "SUCCESS" | "ERROR" | "WARNING") {
@@ -70,6 +97,21 @@ function getColor(type: "INFO" | "SUCCESS" | "ERROR" | "WARNING") {
       return "orange";
     default:
       return "black";
+  }
+}
+
+function getBackgroundColor(type: "INFO" | "SUCCESS" | "ERROR" | "WARNING") {
+  switch (type) {
+    case "INFO":
+      return "#D3D3D3"; // light grey
+    case "SUCCESS":
+      return "#98FB98"; // pastel green
+    case "ERROR":
+      return "#FFB6C1"; // pastel red
+    case "WARNING":
+      return "#FFD700"; // pastel orange
+    default:
+      return "white";
   }
 }
 

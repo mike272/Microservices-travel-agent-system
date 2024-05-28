@@ -38,13 +38,19 @@ async function searchHotels(
   location: string | undefined,
   dateFrom: string | undefined,
   dateTo: string | undefined,
-  guests: number
+  guests: {
+    adults: number;
+    children: number;
+    infants: number;
+  }
 ) {
   const params = new URLSearchParams();
   params.append("toLocation", location || "");
   params.append("fromDate", dateFrom || "");
   params.append("toDate", dateTo || "");
-  params.append("guests", guests.toString());
+  params.append("adults", guests.adults.toString());
+  params.append("children", guests.children.toString());
+  params.append("infants", guests.infants.toString());
 
   try {
     let response = await fetch(
@@ -62,6 +68,7 @@ async function searchHotels(
     return [];
   }
 }
+
 async function searchTrips(
   fromLocation: string | undefined,
   toLocation: string | undefined,
@@ -99,4 +106,41 @@ async function searchTrips(
   }
 }
 
-export { searchTrips, searchHotels };
+async function searchTransports(
+  fromLocation: string | undefined,
+  toLocation: string | undefined,
+  dateFrom: string | undefined,
+  dateTo: string | undefined,
+  passengers: {
+    adults: number;
+    children: number;
+    infants: number;
+  }
+) {
+  const params = new URLSearchParams();
+  params.append("fromLocation", fromLocation || "");
+  params.append("toLocation", toLocation || "");
+  params.append("fromDate", dateFrom || "");
+  params.append("toDate", dateTo || "");
+  params.append("adults", passengers.adults.toString());
+  params.append("children", passengers.children.toString());
+  params.append("infants", passengers.infants.toString());
+
+  try {
+    let response = await fetch(
+      `${API_GATEWAY_ADDRESS}/v1/transports/search?${params.toString()}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return response.json();
+  } catch (e) {
+    console.error(e);
+    return [];
+  }
+}
+
+export { searchTrips, searchHotels, searchTransports };
