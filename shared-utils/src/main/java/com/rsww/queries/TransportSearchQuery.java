@@ -21,4 +21,7 @@ public class TransportSearchQuery
     private Date toDate;
     private String fromLocation;
     private String toLocation;
+    private int numOfAdults;
+    private int numOfChildren;
+    private int numOfInfants;
 }

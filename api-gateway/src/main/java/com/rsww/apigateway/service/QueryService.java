@@ -22,10 +22,12 @@ import com.rsww.queries.HotelInfoQuery;
 import com.rsww.queries.HotelRoomsQuery;
 import com.rsww.queries.HotelSearchQuery;
 import com.rsww.queries.TransportEventsQuery;
+import com.rsww.queries.TransportSearchQuery;
 import com.rsww.queries.TripSearchQuery;
 import com.rsww.responses.AvailableHotelsResponse;
 import com.rsww.responses.AvailableRoomsResponse;
 import com.rsww.responses.AvailableTransportsResponse;
+import com.rsww.responses.HotelDetailsResponse;
 import com.rsww.responses.TripSearchResponse;
 
 
@@ -41,7 +43,14 @@ public class QueryService
         this.queryGateway = queryGateway;
     }
 
-    public List<Trip> forwardSearchTrips(final String fromLocation, final String toLocation, final Date fromDate, final Date toDate) throws InterruptedException, ExecutionException, TimeoutException
+    public List<Trip> forwardSearchTrips(final String fromLocation,
+                                         final String toLocation,
+                                         final Date fromDate,
+                                         final Date toDate,
+                                         final int adults,
+                                         final int children,
+                                         final int infants
+    ) throws InterruptedException, ExecutionException, TimeoutException
     {
         logger.info("Searching trips from {} to {} from {} to {}", fromLocation, toLocation, fromDate, toDate);
         final TripSearchQuery query = TripSearchQuery
@@ -50,11 +59,20 @@ public class QueryService
             .withFromLocation(fromLocation)
             .withToDate(toDate)
             .withToLocation(toLocation)
+            .withNumOfAdults(adults)
+            .withNumOfChildren(children)
+            .withNumOfInfants(infants)
             .build();
 
         return queryGateway.query(query, TripSearchResponse.class).get(10, TimeUnit.SECONDS).getTrips();
     }
-    public AvailableHotelsResponse forwardSearchHotels(@Nullable final String toLocation,@Nullable final Date fromDate,@Nullable final Date toDate) throws InterruptedException, ExecutionException, TimeoutException
+
+    public AvailableHotelsResponse forwardSearchHotels(@Nullable final String toLocation,
+                                                       final Date fromDate,
+                                                       final Date toDate,
+                                                       final int adults,
+                                                       final int children,
+                                                       final int infants) throws InterruptedException, ExecutionException, TimeoutException
     {
         logger.info("Searching hotels in {} from {} to {}", toLocation, fromDate, toDate);
         final HotelSearchQuery query = HotelSearchQuery
@@ -62,35 +80,58 @@ public class QueryService
             .withFromDate(fromDate)
             .withToDate(toDate)
             .withToLocation(toLocation)
+            .withNumOfAdults(adults)
+            .withNumOfChildren(children)
+            .withNumOfInfants(infants)
             .build();
 
         return queryGateway.query(query, AvailableHotelsResponse.class).get(10, TimeUnit.SECONDS);
     }
 
-    public List<Hotel> getHotelDetails(final int hotelId)
+    public AvailableTransportsResponse forwardSearchTransports(@Nullable final String fromLocation,
+                                                               @Nullable final String toLocation,
+                                                               final Date fromDate,
+                                                               final Date toDate,
+                                                               final int adults,
+                                                               final int children,
+                                                               final int infants) throws InterruptedException, ExecutionException, TimeoutException
     {
-        final HotelInfoQuery query = HotelInfoQuery.builder().withHotelId(hotelId).build();
-        final AvailableHotelsResponse response = queryGateway.query(query, AvailableHotelsResponse.class).join();
-        return response.getHotels();
+        logger.info("Searching transports from {} to {} on {}", fromLocation, toLocation, fromDate);
+        final TransportSearchQuery query = TransportSearchQuery
+            .builder()
+            .withFromDate(fromDate)
+            .withFromLocation(fromLocation)
+            .withToDate(toDate)
+            .withToLocation(toLocation)
+            .withNumOfAdults(adults)
+            .withNumOfChildren(children)
+            .withNumOfInfants(infants)
+            .build();
+
+        return queryGateway.query(query, AvailableTransportsResponse.class).get(10, TimeUnit.SECONDS);
     }
 
-    public List<Room> getRooms(final int hotelId, final Date fromDate, final Date toDate, final int numOfPeople)
+    public HotelDetailsResponse getHotelDetails(final int hotelId)
     {
-        final HotelRoomsQuery query = HotelRoomsQuery.builder().withHotelId(hotelId).withCheckInDate(fromDate).withCheckOutDate(toDate).withNumberOfGuests(numOfPeople).build();
+        final HotelInfoQuery query = HotelInfoQuery.builder().withHotelId(hotelId).build();
+        return queryGateway.query(query, HotelDetailsResponse.class).join();
+    }
+
+    public List<Room> getRooms(final int hotelId, final Date fromDate, final Date toDate, final int adults, final int children, final int infants)
+    {
+        final HotelRoomsQuery query =
+            HotelRoomsQuery
+                .builder()
+                .withHotelId(hotelId)
+                .withCheckInDate(fromDate)
+                .withCheckOutDate(toDate)
+                .withNumOfAdults(adults)
+                .withNumOfChildren(children)
+                .withNumOfInfants(infants)
+                .build();
+        
         final AvailableRoomsResponse response = queryGateway.query(query, AvailableRoomsResponse.class).join();
         return response.getRooms();
 
-    }
-
-    public List<TransportEvent> getTransports(final String fromLocation, final String toLocation, final Date fromDate, final Date toDate)
-    {
-        final TransportEventsQuery query = TransportEventsQuery.builder()
-            .withFromLocation(fromLocation)
-            .withToLocation(toLocation)
-            .withFromDate(fromDate)
-            .withToDate(toDate)
-            .build();
-        final AvailableTransportsResponse response = queryGateway.query(query, AvailableTransportsResponse.class).join();
-        return response.getTransports();
     }
 }

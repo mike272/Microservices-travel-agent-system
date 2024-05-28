@@ -20,5 +20,7 @@ public class HotelRoomsQuery
     private int hotelId;
     private Date checkInDate;
     private Date checkOutDate;
-    private int numberOfGuests;
+    private int numOfAdults;
+    private int numOfChildren;
+    private int numOfInfants;
 }

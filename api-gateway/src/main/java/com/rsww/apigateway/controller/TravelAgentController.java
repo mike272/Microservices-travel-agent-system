@@ -2,6 +2,7 @@ package com.rsww.apigateway.controller;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -34,22 +35,19 @@ import lombok.Data;
 @RestController
 @CrossOrigin
 @RequestMapping("/v1/trips")
-public class TravelAgentController{
+public class TravelAgentController
+{
     private static final Logger logger = LoggerFactory.getLogger(TravelAgentController.class);
     SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yy");
 
     @Autowired
     private final QueryService queryService;
 
-
-
-    // endpoint for searching trips with data in body
-    @PostMapping(value = "/search",  consumes = {"application/json"})
-    public ResponseEntity<List<Trip>> searchTrips(@RequestBody final TripSearchQuery request) throws InterruptedException, ExecutionException, TimeoutException
+    private Date getTomorrowDate()
     {
-        logger.info("Received TripSearchQuery: {}", request);
-        final List<Trip> trips = queryService.forwardSearchTrips(request.getFromLocation(), request.getToLocation(), request.getFromDate(), request.getToDate());
-        return ResponseEntity.ok(trips);
+        final Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_YEAR, 1);
+        return calendar.getTime();
     }
 
     // endpoint for searching trips with data in query parameters
@@ -58,66 +56,87 @@ public class TravelAgentController{
         @RequestParam(required = false) final String fromDate,
         @RequestParam(required = false) final String fromLocation,
         @RequestParam(required = false) final String toDate,
-        @RequestParam(required = false) final String toLocation
-    ) throws InterruptedException, ExecutionException, TimeoutException, ParseException
+        @RequestParam(required = false) final String toLocation,
+        @RequestParam(required = false) final Integer adults,
+        @RequestParam(required = false) final Integer children,
+        @RequestParam(required = false) final Integer infants
+    ) throws InterruptedException, ExecutionException, TimeoutException
     {
-        logger.info("Received TripSearchQuery: fromDate={}, fromLocation={}, toDate={}, toLocation={}", fromDate, fromLocation, toDate, toLocation);
-        final Date fromDateCast = formatter.parse(fromDate);
-        final Date toDateCast = formatter.parse(toDate);
+        logger.info("Received TripSearchQuery: fromDate={}, fromLocation={}, toDate={}, toLocation={}, numOfPeople={}",
+            fromDate,
+            fromLocation,
+            toDate,
+            toLocation,
+            adults + children + infants);
+        final Date fromDateCast = fromDate == null || fromDate.isEmpty() ? new Date() : new Date(fromDate);
+        final Date toDateCast = toDate == null || toDate.isEmpty() ? getTomorrowDate() : new Date(toDate);
 
-        final List<Trip> trips = queryService.forwardSearchTrips(fromLocation, toLocation, fromDateCast, toDateCast);
+        final List<Trip> trips = queryService.forwardSearchTrips(fromLocation, toLocation, fromDateCast, toDateCast, adults, children, infants);
 
         return ResponseEntity.ok(trips);
     }
 
-// TODO:: move service functions from this project to Travel Agent project
+    // TODO:: move service functions from this project to Travel Agent project
     @GetMapping(value = "/hotels/{hotelId}/rooms")
     public ResponseEntity<Object> getRooms(
         @PathVariable final String hotelId,
         @RequestParam final String fromDate,
         @RequestParam final String toDate,
-        @RequestParam final int numberOfPeople
-    ) {
-        logger.info("Received request for getting rooms in hotelId={}, fromDate={}, toDate={}, numberOfPeople={}", hotelId, fromDate, toDate, numberOfPeople);
-        try {
+        @RequestParam(required = false) final Integer adults,
+        @RequestParam(required = false) final Integer children,
+        @RequestParam(required = false) final Integer infants)
+    {
+        logger.info("Received request for getting rooms in hotelId={}, fromDate={}, toDate={}, numberOfPeople={}",
+            hotelId,
+            fromDate,
+            toDate,
+            adults + children + infants);
+        try
+        {
             // parse params
             final int hotelIdInt = Integer.parseInt(hotelId);
-            final Date fromDateCast = formatter.parse(fromDate);
-            final Date toDateCast = formatter.parse(toDate);
-            final List<Room> rooms = queryService.getRooms(hotelIdInt, fromDateCast, toDateCast, numberOfPeople);
+            final Date fromDateCast = fromDate == null || fromDate.isEmpty() ? new Date() : new Date(fromDate);
+            final Date toDateCast = toDate == null || toDate.isEmpty() ? getTomorrowDate() : new Date(toDate);
+
+            final List<Room> rooms = queryService.getRooms(hotelIdInt, fromDateCast, toDateCast, adults, children, infants);
             return ResponseEntity.ok(rooms);
-        } catch (final NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid hotelId: " + hotelId);
         }
-        catch (final ParseException e)
+        catch (final NumberFormatException e)
         {
-//            TODO:: create specific exceptions for the whole application
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException("Invalid hotelId: " + hotelId);
         }
     }
 
     @GetMapping(value = "/hotels/{hotelId}")
-    public ResponseEntity<Object> getHotelDetails(@PathVariable final String hotelId) {
+    public ResponseEntity<Object> getHotelDetails(@PathVariable final String hotelId)
+    {
         logger.info("Received request for getting hotel details for hotelId={}", hotelId);
-        try {
+        try
+        {
             // parse params
             final int hotelIdInt = Integer.parseInt(hotelId);
             final Object hotelDetails = queryService.getHotelDetails(hotelIdInt);
             return ResponseEntity.ok(hotelDetails);
-        } catch (NumberFormatException e) {
+        }
+        catch (NumberFormatException e)
+        {
             throw new IllegalArgumentException("Invalid hotelId: " + hotelId);
         }
     }
 
     @GetMapping(value = "/transports/{transportId}")
-    public ResponseEntity<Object> getTransportDetails(@PathVariable final String transportId) {
+    public ResponseEntity<Object> getTransportDetails(@PathVariable final String transportId)
+    {
         logger.info("Received request for getting transport details for transportId={}", transportId);
-        try {
+        try
+        {
             // parse params
 //            int transportIdInt = Integer.parseInt(transportId);
 //            final Object transportDetails = queryService.get(transportIdInt);
             return ResponseEntity.ok("not implemented yet");
-        } catch (NumberFormatException e) {
+        }
+        catch (NumberFormatException e)
+        {
             throw new IllegalArgumentException("Invalid transportId: " + transportId);
         }
     }
@@ -128,6 +147,5 @@ public class TravelAgentController{
 //        // Return the result
 //        return ResponseEntity.ok("not implemented yet");
 //    }
-
 
 }
