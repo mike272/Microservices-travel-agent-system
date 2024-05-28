@@ -2,25 +2,28 @@
 import { useState } from "react";
 import { TwoLevelInput } from "./two-level-input";
 import { SearchButton } from "./search-button";
-import { searchHotels, searchTrips } from "@/lib/api/search-api";
-import {
-  formatTwoDatesToString,
-  getDateNDaysFromToday,
-} from "@/lib/utils/util-functions";
+import { searchTransports } from "@/lib/api/search-api";
+
 import { TwoLevelDatePicker } from "./two-level-date-picker";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
-import { setHotels } from "@/lib/redux/reducers/hotelsReducer";
 import { Button, InputNumber, Modal } from "antd";
+import { setTransports } from "@/lib/redux/reducers/transportsReducer";
+import {
+  setDatePreferenceInformation,
+  setGuestsPreferenceInformation,
+  setLocationPreferenceInformation,
+} from "@/lib/redux/reducers/bookingReducer";
 type Props = {
   setTripsData: (data: any) => void;
   setHotelsData: (data: any) => void;
+  setTransportData: (data: any) => void;
 };
 
 export const SearchBar = (props: Props) => {
-  const { setTripsData, setHotelsData } = props;
-  const [fromState, setFromState] = useState("");
-  const [toState, setToState] = useState("");
+  const { setTransportData } = props;
+  const [fromLocation, setFromLocation] = useState("");
+  const [toLocation, setToLocation] = useState("");
   const router = useRouter();
   const dispatch = useDispatch();
 
@@ -41,40 +44,50 @@ export const SearchBar = (props: Props) => {
     setIsModalVisible(false);
   };
 
-  async function onClick() {
-    // let data = await searchTrips(fromState, toState, fromDate, toDate, {
-    //   adults: 1,
-    //   children: 0,
-    //   infants: 0,
-    // });
-    let data = await searchHotels(fromState, fromDate, toDate, guests);
-    let hotels = data?.hotels ?? [];
-    // setTripsData(data);
-    console.log(hotels);
-    setHotelsData(hotels);
-    dispatch(setHotels(hotels));
-    router.push("/hotels");
+  async function onTransportClick() {
+    dispatch(setGuestsPreferenceInformation(guests));
+    dispatch(
+      setDatePreferenceInformation({
+        fromDate: fromDate,
+        toDate: toDate,
+      })
+    );
+    dispatch(setLocationPreferenceInformation({ fromLocation, toLocation }));
+
+    let data = await searchTransports(
+      fromLocation,
+      toLocation,
+      fromDate,
+      toDate,
+      guests
+    );
+    console.log({ data });
+    let transportsResponse = data?.transports ?? [];
+
+    setTransportData(transportsResponse);
+    dispatch(setTransports(transportsResponse));
+    router.push("/transports");
   }
+
   return (
     <div className="flex justify-between items-center rounded-xl border border-black h-20 w-full ml-5 mr-5 p-5 ">
       <TwoLevelInput
         label={"Skąd?"}
         placeholder={"Warszawa"}
-        value={fromState}
-        onChange={setFromState}
+        value={fromLocation}
+        onChange={setFromLocation}
       />
       <TwoLevelInput
         label={"Dokąd?"}
         placeholder={"Brazylia"}
-        value={toState}
-        onChange={setToState}
+        value={toLocation}
+        onChange={setToLocation}
       />
       <TwoLevelDatePicker
         label={"Data wylotu"}
         placeholder={"06/05/2024"}
         // value={formatTwoDatesToString(whenState.from, whenState.to)}
         onChange={(date, dateString) => {
-          console.log({ date, dateString });
           setFromDate(dateString);
         }}
       />
@@ -87,7 +100,7 @@ export const SearchBar = (props: Props) => {
         }}
       />
       <Button
-        className="bg-blue-500 hover:bg-blue-700 text-black font-bold px-4 rounded"
+        className="bg-white hover:bg-blue-700 text-black font-medium px-4 rounded"
         onClick={showModal}
       >
         Guests
@@ -121,7 +134,7 @@ export const SearchBar = (props: Props) => {
           onChange={(value) => setGuests({ ...guests, infants: value })}
         />
       </Modal>
-      <SearchButton onClick={onClick} />
+      <SearchButton onClick={onTransportClick} />
     </div>
   );
 };

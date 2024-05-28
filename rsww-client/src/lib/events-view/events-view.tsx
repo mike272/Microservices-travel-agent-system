@@ -62,7 +62,7 @@ const EventsView = () => {
         <Button
           type="primary"
           onClick={() => setIsToggled(false)}
-          style={{ position: "absolute", right: 0, top: "166px" }}
+          style={{ position: "absolute", right: 0, top: "20px" }}
         >
           {isToggled ? ">>" : "<<"}
         </Button>
@@ -76,7 +76,7 @@ const EventsView = () => {
 
   function HiddenView() {
     return (
-      <div className="absolute w-10 h-10 top-40 right-0">
+      <div className="absolute w-10 h-10 top-5 right-0">
         <Button onClick={() => setIsToggled(true)}>{"<<"}</Button>
       </div>
     );

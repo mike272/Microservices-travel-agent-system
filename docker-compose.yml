@@ -1,0 +1,92 @@
+version: '1'
+services:
+  # rabbitmq:
+  #   image: rabbitmq:3-management
+  #   ports:
+  #     - 5672:5672
+  #     - 15672:15672
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: postgres
+    ports:
+      - 5432:5432
+
+
+  axonserver:
+    image: axoniq/axonserver
+    ports:
+      - 8024:8024
+      - 8124:8124
+
+  # travel-agent:
+  #   build:
+  #     context: ./TA
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - 8081:8081
+  #   depends_on:
+  #     - rabbitmq
+  #     - postgres
+  #     - axonserver
+
+  # hotel-service:
+  #   build:
+  #     context: ./hotel-service
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - 8082:8082
+  #   depends_on:
+  #     - rabbitmq
+  #     - postgres
+  #     - axonserver
+  # # not yet implemented
+  # # transport-service:
+  # #   build:
+  # #     context: ./transport-service
+  # #     dockerfile: Dockerfile
+  # #   ports:
+  # #     - 8083:8083
+  # #   depends_on:
+  # #     - rabbitmq
+  # #     - postgres
+  # #     - axonserver
+  # payment-service:
+  #   build:
+  #     context: ./payment-service
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - 8084:8084
+  #   depends_on:
+  #     - rabbitmq
+  #     - postgres
+  #     - axonserver
+  # api-gateway:
+  #   build:
+  #     context: ./api-gateway
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - 8080:8080
+  #   depends_on:
+  #     # - rabbitmq
+  #     - postgres
+  #     - axonserver
+  # saga-orchestrator:
+  #   build:
+  #     context: ./saga-orchestrator
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - 8085:8085
+  #   depends_on:
+  #     - rabbitmq
+  #     - postgres
+  #     - axonserver
+  #rsww-client:
+   # build:
+   #  context: ./rsww-client
+   # dockerfile: Dockerfile
+   #ports:
+   #   - 3000:3000

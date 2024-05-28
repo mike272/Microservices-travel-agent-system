@@ -62,7 +62,7 @@ async function searchHotels(
         },
       }
     );
-    return response.json();
+    return await response.json();
   } catch (e) {
     console.error(e);
     return [];
@@ -99,7 +99,7 @@ async function searchTrips(
         },
       }
     );
-    return response.json();
+    return await response.json();
   } catch (e) {
     console.error(e);
     return [];
@@ -128,7 +128,7 @@ async function searchTransports(
 
   try {
     let response = await fetch(
-      `${API_GATEWAY_ADDRESS}/v1/transports/search?${params.toString()}`,
+      `${API_GATEWAY_ADDRESS}/v1/transport/search?${params.toString()}`,
       {
         method: "GET",
         headers: {
@@ -136,7 +136,7 @@ async function searchTransports(
         },
       }
     );
-    return response.json();
+    return await response.json();
   } catch (e) {
     console.error(e);
     return [];

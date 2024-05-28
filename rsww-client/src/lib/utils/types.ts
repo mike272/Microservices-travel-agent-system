@@ -3,9 +3,16 @@ type Trip = {
   name: string;
   description: string;
   location: string;
-  fromDate: string;
-  toDate: string;
+  fromDate: Date;
+  toDate: Date;
   hotel: Hotel;
+};
+
+type Room = {
+  id: number;
+  name: string;
+  price: number;
+  capacity: number;
 };
 
 type Hotel = {
@@ -18,8 +25,8 @@ type Hotel = {
   city: string;
   description: string;
   location: string;
-  fromDate: string;
-  toDate: string;
+  fromDate: Date;
+  toDate: Date;
   price: number;
   rating: number;
   reviews: number;
@@ -30,19 +37,20 @@ type Transportation = {
   id: number;
   name: string;
   description: string;
-  location: string;
-  fromDate: string;
-  fromTime: string;
-  toDate: string;
+  fromLocation: string;
+  toLocation: string;
+  fromDate: Date;
+  toDate: Date;
   price: number;
   rating: number;
   reviews: number;
   image: string;
+  availableSeats: number;
 };
 
 type EventType = {
   message: string;
-  type: 'INFO' | 'SUCCESS' | 'ERROR' | 'WARNING';
+  type: "INFO" | "SUCCESS" | "ERROR" | "WARNING";
 };
 
-export type { Trip, Hotel, Transportation, EventType };
+export type { Trip, Hotel, Transportation, EventType, Room };

@@ -1,14 +1,16 @@
-import { Hotel } from "@/lib/utils/types";
+import { Hotel, Room } from "@/lib/utils/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-
 
 interface HotelsState {
   hotels: Hotel[];
+  selectedHotel: Hotel | null;
+  selectedRooms: Room[];
 }
 
 const initialState: HotelsState = {
   hotels: [],
+  selectedHotel: null,
+  selectedRooms: [],
 };
 
 const hotelsSlice = createSlice({
@@ -18,9 +20,16 @@ const hotelsSlice = createSlice({
     setHotels: (state, action: PayloadAction<Hotel[]>) => {
       state.hotels = action.payload;
     },
+    setSelectedHotel: (state, action: PayloadAction<Hotel>) => {
+      state.selectedHotel = action.payload;
+    },
+    setSelectedRooms: (state, action: PayloadAction<Room[]>) => {
+      state.selectedRooms = action.payload;
+    },
   },
 });
 
-export const { setHotels } = hotelsSlice.actions;
+export const { setHotels, setSelectedHotel, setSelectedRooms } =
+  hotelsSlice.actions;
 
 export default hotelsSlice.reducer;
