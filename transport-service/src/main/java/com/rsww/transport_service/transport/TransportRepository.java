@@ -10,14 +10,15 @@ import org.springframework.data.repository.query.Param;
 
 public interface TransportRepository extends CrudRepository<Transport, Integer>
 {
+    @Query(
+        "SELECT t FROM Transport t WHERE t.departureCity = :departureLocation AND t.destinationCity = :arrivalLocation AND t.departureDate >= :departureDate ORDER BY t.departureDate ASC")
+    List<Transport> findDepartureFlights(@Param("departureLocation") String departureLocation,
+                                         @Param("arrivalLocation") String arrivalLocation,
+                                         @Param("departureDate") Date departureDate);
 
-    @Query("SELECT t FROM Transport t LEFT JOIN Reservation r ON t.id = r.transport.id " +
-        "WHERE t.departureLocation = :departureLocation AND t.arrivalLocation = :arrivalLocation " +
-        "AND t.departureDate = :departureDate " +
-        "GROUP BY t.id " +
-        "HAVING (t.totalPlaces - COALESCE(SUM(r.reservedPlaces), 0)) >= :numberOfPeople")
-    List<Transport> findAvailableTransports(@Param("departureLocation") String departureLocation,
-                                            @Param("arrivalLocation") String arrivalLocation,
-                                            @Param("departureDate") Date departureDate,
-                                            @Param("numberOfPeople") Integer numberOfPeople);
+    @Query(
+        "SELECT t FROM Transport t WHERE t.departureCity = :departureLocation AND t.destinationCity = :arrivalLocation AND t.departureDate >= :returnDate ORDER BY t.departureDate ASC")
+    List<Transport> findReturnFlights(@Param("departureLocation") String departureLocation,
+                                      @Param("arrivalLocation") String arrivalLocation,
+                                      @Param("returnDate") Date returnDate);
 }

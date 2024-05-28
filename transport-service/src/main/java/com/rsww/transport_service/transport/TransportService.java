@@ -6,7 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.axonframework.eventhandling.gateway.EventGateway;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
-import com.rsww.events.HotelsInitializedEvent;
 import com.rsww.events.TransportsInitializedEvent;
 
 
@@ -26,16 +25,30 @@ public class TransportService
     private final EventGateway eventGateway;
 
     @Autowired
-    public TransportService(final TransportRepository transportRepository, final EventGateway eventGateway) {
+    public TransportService(final TransportRepository transportRepository,
+                            final EventGateway eventGateway)
+    {
         this.transportRepository = transportRepository;
         this.eventGateway = eventGateway;
     }
 
-    public List<Transport> findAvailableTransports(final String departureLocation, final String arrivalLocation, final Date departureDate, final Integer numberOfPeople) {
-        return transportRepository.findAvailableTransports(departureLocation, arrivalLocation, departureDate, numberOfPeople);
+    public List<Transport> findAvailableTransports(final String departureLocation,
+                                                   final String arrivalLocation,
+                                                   final Date departureDate,
+                                                   final Date returnDate,
+                                                   final int adults,
+                                                   final int children,
+                                                   final int infants)
+    {
+        // not sure if I want to filter by number of people here.
+        // I think it will be more informative to return all results to client and client will show that there are no available seats
+        final var outgoingTransports = transportRepository.findDepartureFlights(departureLocation, arrivalLocation, departureDate);
+        final var returnTransports = transportRepository.findReturnFlights(arrivalLocation, departureLocation, returnDate);
+        return Stream.of(outgoingTransports, returnTransports).flatMap(List::stream).toList();
     }
 
-    public com.rsww.dto.Transport mapToDtoTransport(final Transport transport){
+    public com.rsww.dto.Transport mapToDtoTransport(final Transport transport)
+    {
         return com.rsww.dto.Transport.builder()
             .withTransportType(transport.getTransportType())
             .withDepartureDate(transport.getDepartureDate())

@@ -6,16 +6,22 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 
 @Entity
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder(toBuilder = true, setterPrefix = "with")
+@Table(name = "transportReservation")
 public class Reservation {
     @Id
-    private Integer id;
+    private int reservation_id;
 
     @ManyToOne
     @JoinColumn(name = "id")
