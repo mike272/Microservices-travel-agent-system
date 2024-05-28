@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventhandling.gateway.EventGateway;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import com.rsww.commands.InitializeHotels;
 import com.rsww.commands.ReserveHotelCommand;
@@ -14,15 +14,16 @@ import com.rsww.hotelService.hotel.HotelService;
 import com.rsww.hotelService.reservation.ReservationService;
 
 
-@Service
-public class HotelCommandHandler {
-
+@Component
+public class HotelCommandHandler
+{
 
     private final HotelService hotelService;
     private final ReservationService reservationService;
     private final EventGateway eventGateway;
 
-    public HotelCommandHandler(final HotelService hotelService, final ReservationService reservationService, final EventGateway eventGateway) {
+    public HotelCommandHandler(final HotelService hotelService, final ReservationService reservationService, final EventGateway eventGateway)
+    {
         this.hotelService = hotelService;
         this.reservationService = reservationService;
         this.eventGateway = eventGateway;
@@ -35,7 +36,8 @@ public class HotelCommandHandler {
     }
 
     @CommandHandler
-    public void handle(final ReserveHotelCommand command) {
+    public void handle(final ReserveHotelCommand command)
+    {
         final var hasReservationSucceeded = reservationService.reserveRooms(
             command.getCustomerId(),
             command.getHotelId(),
@@ -46,7 +48,8 @@ public class HotelCommandHandler {
             command.getNumOfChildren(),
             command.getNumOfInfants()
         );
-        if(!hasReservationSucceeded){
+        if (!hasReservationSucceeded)
+        {
             eventGateway.publish(HotelReservationEvent
                 .builder()
                 .withHotelId(command.getHotelId())
@@ -58,6 +61,5 @@ public class HotelCommandHandler {
             );
         }
     }
-
 
 }

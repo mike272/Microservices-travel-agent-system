@@ -2,14 +2,13 @@ package com.rsww.hotelService.room;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
-import com.rsww.hotelService.room.RoomRepository;
+
 
 @Repository
 public class RoomRepositoryImpl implements RoomRepository
@@ -55,7 +54,6 @@ public class RoomRepositoryImpl implements RoomRepository
         return false;
     }
 
-
     @Override
     @Transactional
     public List<Room> findAll()
@@ -80,8 +78,6 @@ public class RoomRepositoryImpl implements RoomRepository
     {
 
     }
-
-
 
     @Override
     public void delete(final Room entity)

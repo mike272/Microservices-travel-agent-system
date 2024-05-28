@@ -18,7 +18,8 @@ import com.rsww.hotelService.room.Room;
 @Builder(setterPrefix = "with")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Reservation {
+public class Reservation
+{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -26,12 +27,10 @@ public class Reservation {
     @ManyToOne
     @JoinColumn(name = "room_id")
     private Room room;
-    private int roomId;
 
     @ManyToOne
     @JoinColumn(name = "hotel_id")
     private Hotel hotel;
-    private int hotelId;
 
     private int clientId;
     private int numberOfAdults;

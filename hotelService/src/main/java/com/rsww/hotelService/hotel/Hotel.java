@@ -28,14 +28,5 @@ public class Hotel
     private String description;
 
 //    @OneToMany(mappedBy = "hotel")
-//    private Set<Hotelreservation> hotelreservations = new LinkedHashSet<>();
-//
-//    @OneToMany(mappedBy = "hotel")
-//    private Set<Hotelroom> hotelrooms = new LinkedHashSet<>();
-
-//    private String location;
-//    private Double minPrice;
-
-//    @OneToMany(mappedBy = "hotel")
 //    private List<Room> rooms;
 }

@@ -3,23 +3,22 @@ package com.rsww.hotelService.hotel;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
 
-@Service
+@Repository
 public class HotelRepositoryImpl implements HotelRepository
 {
     @PersistenceContext
     private EntityManager entityManager;
 
-
     @Override
     public List<Hotel> findHotelsByLocation(final String location)
     {
-        return entityManager.createQuery("SELECT h FROM Hotel h WHERE h.city = :location", Hotel.class)
+        return entityManager.createQuery("SELECT h FROM Hotel h WHERE LOWER(h.city) = LOWER(:location)", Hotel.class)
             .setParameter("location", location)
             .getResultList();
     }
@@ -27,20 +26,20 @@ public class HotelRepositoryImpl implements HotelRepository
     @Override
     public <S extends Hotel> S save(final S entity)
     {
-        entityManager
-            .persist(Hotel
-                .builder()
-                .withCity(entity.getCity())
-                .withName(entity.getName())
-                .withDescription(entity.getDescription())
-                .build());
-        return null;
+        final Hotel hotel = Hotel
+            .builder()
+            .withCity(entity.getCity())
+            .withName(entity.getName())
+            .withDescription(entity.getDescription())
+            .build();
+        entityManager.persist(hotel);
+        return (S) hotel;
     }
 
     @Override
     public <S extends Hotel> Iterable<S> saveAll(final Iterable<S> entities)
     {
-        entities.forEach(entity->entityManager.persist(
+        entities.forEach(entity -> entityManager.persist(
             Hotel.builder()
                 .withCity(entity.getCity())
                 .withAreChildrenAllowed(entity.isAreChildrenAllowed())

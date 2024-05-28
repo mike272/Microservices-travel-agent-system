@@ -24,6 +24,7 @@ public class HotelSearchQueryHandler
         this.roomService = roomService;
         this.hotelService = hotelService;
     }
+
     @QueryHandler
     public AvailableHotelsResponse handle(final TripSearchQuery query)
     {
@@ -35,11 +36,11 @@ public class HotelSearchQueryHandler
     public AvailableHotelsResponse handle(final HotelSearchQuery query)
     {
         logger.info("Received HotelSearchQuery: {}", query);
-        AvailableHotelsResponse hotels = AvailableHotelsResponse.builder()
+        final AvailableHotelsResponse hotels = AvailableHotelsResponse.builder()
             .withHotels(hotelService.getHotelsByLocation(query.getToLocation())
             ).build();
         logger.info("Returning {} hotels", (long) hotels.getHotels().size());
-    // optionally check if those hotels have enough rooms available
+        // optionally check if those hotels have enough rooms available
         return hotels;
     }
 }

@@ -4,17 +4,14 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.axonframework.eventhandling.gateway.EventGateway;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
-import com.rsww.dto.ReservationEventType;
 import com.rsww.events.HotelsInitializedEvent;
 
 
@@ -24,14 +21,14 @@ public class HotelService
     private final HotelRepositoryImpl hotelRepository;
     private final EventGateway eventGateway;
 
-    @Autowired
     public HotelService(final HotelRepositoryImpl hotelRepository, final EventGateway eventGateway)
     {
         this.hotelRepository = hotelRepository;
         this.eventGateway = eventGateway;
     }
 
-    public com.rsww.dto.Hotel mapToDtoHotel(final Hotel hotelEntity) {
+    public com.rsww.dto.Hotel mapToDtoHotel(final Hotel hotelEntity)
+    {
         return com.rsww.dto.Hotel.builder()
             .withDescription(hotelEntity.getDescription())
 //            .withLocation(hotelEntity.getLocation())
@@ -44,10 +41,10 @@ public class HotelService
     public List<com.rsww.dto.Hotel> getHotelsByLocation(final String location)
     {
         return hotelRepository
-            .findAll()
+            .findHotelsByLocation(location)
             .stream()
             .map(this::mapToDtoHotel)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     public List<com.rsww.dto.Hotel> initializeHotelsDatabase() throws IOException
