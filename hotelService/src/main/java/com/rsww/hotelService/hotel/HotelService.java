@@ -49,7 +49,7 @@ public class HotelService
 
     public List<com.rsww.dto.Hotel> initializeHotelsDatabase() throws IOException
     {
-        final Reader reader = Files.newBufferedReader(Paths.get("./scrapHotel.csv"));
+        final Reader reader = Files.newBufferedReader(Paths.get("./src/main/java/com/rsww/hotelService/hotel/scrapHotel.csv"));
         final CsvToBean<Hotel> csvToBean = new CsvToBeanBuilder<Hotel>(reader)
             .withType(Hotel.class)
             .withIgnoreLeadingWhiteSpace(true)
@@ -57,6 +57,14 @@ public class HotelService
 
         final List<Hotel> hotels = csvToBean.parse();
         final List<Hotel> hotelsSubList = hotels.subList(0, Math.min(10, hotels.size()));
+
+        for (final Hotel hotel : hotels)
+        {
+            if (hotel.getDescription().length() > 200)
+            {
+                hotel.setDescription(hotel.getDescription().substring(0, 200));
+            }
+        }
 
         hotelRepository.saveAll(hotelsSubList);
         final var hotelsList = hotelsSubList.stream().map(this::mapToDtoHotel).toList();

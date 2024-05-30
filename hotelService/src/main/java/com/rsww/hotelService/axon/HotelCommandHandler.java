@@ -6,7 +6,7 @@ import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventhandling.gateway.EventGateway;
 import org.springframework.stereotype.Component;
 
-import com.rsww.commands.InitializeHotels;
+import com.rsww.commands.InitializeHotelsCommand;
 import com.rsww.commands.ReserveHotelCommand;
 import com.rsww.dto.ReservationEventType;
 import com.rsww.events.HotelReservationEvent;
@@ -30,7 +30,7 @@ public class HotelCommandHandler
     }
 
     @CommandHandler
-    public void handle(final InitializeHotels command) throws IOException
+    public void handle(final InitializeHotelsCommand command) throws IOException
     {
         hotelService.initializeHotelsDatabase();
     }

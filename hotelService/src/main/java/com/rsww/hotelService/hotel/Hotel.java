@@ -25,6 +25,7 @@ public class Hotel
     private String country;
     private int starsNum;
     private boolean areChildrenAllowed;
+    @Column(length = 10000)
     private String description;
 
 //    @OneToMany(mappedBy = "hotel")

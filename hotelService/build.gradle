@@ -38,7 +38,10 @@ dependencies {
     implementation files('..\\shared-utils\\build\\libs\\shared-utils-0.1-SNAPSHOT.jar')
     implementation 'org.axonframework:axon-spring-boot-starter:+'
     implementation 'org.axonframework:axon-test:+'
-//    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.0'
+
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.16.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.16.0'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.16.0'
 }
 
 dependencyManagement {

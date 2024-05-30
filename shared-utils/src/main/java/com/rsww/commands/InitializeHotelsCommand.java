@@ -6,6 +6,6 @@ import lombok.Data;
  * Command to initialize hotels in the database
  */
 @Data
-public class InitializeHotels
+public class InitializeHotelsCommand
 {
 }

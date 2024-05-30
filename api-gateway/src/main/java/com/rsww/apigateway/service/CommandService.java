@@ -9,10 +9,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.rsww.commands.InitializeHotels;
+import com.rsww.commands.InitializeHotelsCommand;
+import com.rsww.commands.InitializeTransportsCommand;
+import com.rsww.commands.ReserveHotelCommand;
 import com.rsww.commands.ReserveTripCommand;
 import com.rsww.dto.ReservationConfirmation;
-import com.rsww.responses.AvailableHotelsResponse;
 
 
 @Service
@@ -40,9 +41,19 @@ public class CommandService
         return reservationData;
     }
 
-    public void initializeHotels(){
-        commandGateway.send(new InitializeHotels());
-    }
+    public void initializeHotels()
+    {
+        try
+        {
+            commandGateway.send(new InitializeHotelsCommand());
+            commandGateway.send(new InitializeTransportsCommand());
+        }
+        catch (final Exception e)
+        {
+            logger.error("ERROR occurred while initializing hotels: ", e);
 
+        }
+
+    }
 
 }
