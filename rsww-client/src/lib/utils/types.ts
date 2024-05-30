@@ -49,7 +49,7 @@ type Transportation = {
 };
 
 type EventType = {
-  message: string;
+  textContent: string;
   type: "INFO" | "SUCCESS" | "ERROR" | "WARNING";
 };
 

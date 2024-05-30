@@ -38,7 +38,7 @@ const EventsView = () => {
           setEvents((prevEvents) => [...prevEvents, eventData]);
 
           notification.open({
-            message: eventData.message,
+            message: eventData.textContent,
             type: eventData.type.toLowerCase() as
               | "info"
               | "success"
@@ -65,7 +65,7 @@ const EventsView = () => {
     };
   }, []);
 
-  function EventRow({ type, message }: EventType) {
+  function EventRow({ type, textContent }: EventType) {
     return (
       <div
         style={{
@@ -77,7 +77,7 @@ const EventsView = () => {
           margin: "10px 0",
         }}
       >
-        {message}
+        {textContent}
       </div>
     );
   }
@@ -103,7 +103,11 @@ const EventsView = () => {
         </Button>
         {isToggled &&
           events.map((event, index) => (
-            <EventRow key={index} type={event.type} message={event.message} />
+            <EventRow
+              key={index}
+              type={event.type}
+              textContent={event.textContent}
+            />
           ))}
       </div>
     );

@@ -57,9 +57,9 @@ public class TransportService
             .build();
     }
 
-    public List<com.rsww.dto.Transport> initializeTransports() throws IOException
+    public void initializeTransports() throws IOException
     {
-        final Reader reader = Files.newBufferedReader(Paths.get("./scrapTransport.csv"));
+        final Reader reader = Files.newBufferedReader(Paths.get("./src/main/java/com/rsww/transport_service/transport/scrapTransport.csv"));
         final CsvToBean<Transport> csvToBean = new CsvToBeanBuilder<Transport>(reader)
             .withType(Transport.class)
             .withIgnoreLeadingWhiteSpace(true)
@@ -67,10 +67,9 @@ public class TransportService
 
         final List<Transport> transports = csvToBean.parse();
         final List<Transport> transportsSubList = transports.subList(0, Math.min(10, transports.size()));
-
         transportRepository.saveAll(transportsSubList);
+
         final var transportsList = transportsSubList.stream().map(this::mapToDtoTransport).toList();
         eventGateway.publish(TransportsInitializedEvent.builder().withTransports(transportsList).build());
-        return transportsList;
     }
 }

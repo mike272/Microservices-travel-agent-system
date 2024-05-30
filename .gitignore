@@ -28,3 +28,5 @@ replay_pid*
 
 # Visual Studio Code files
 .vscode/
+# Environment files
+*.env
