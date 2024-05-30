@@ -1,5 +1,8 @@
 package com.rsww.apigateway.websocket;
+
 import org.axonframework.eventhandling.EventHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
@@ -15,117 +18,140 @@ import com.rsww.events.TransportsInitializedEvent;
 
 
 @Component
-public class AxonEventHandler {
-
+public class AxonEventHandler
+{
+    private final String TOPIC_NAME = "/topic/messages";
     private final SimpMessagingTemplate template;
+    private static final Logger logger = LoggerFactory.getLogger(AxonEventHandler.class);
 
     @Autowired
-    public AxonEventHandler(SimpMessagingTemplate template) {
+    public AxonEventHandler(final SimpMessagingTemplate template)
+    {
         this.template = template;
     }
 
     @EventHandler
-    public void on(final HotelsInitializedEvent event) {
+    public void on(final HotelsInitializedEvent event)
+    {
+        logger.info("Received event: HotelsInitializedEvent");
         final Message message = Message
             .builder()
             .withType("INFO")
             .withTextContent(event.getHotels().size() + " hotels initialized")
             .build();
-        template.convertAndSend("/send", message);
+        template.convertAndSend(TOPIC_NAME, message);
     }
 
     @EventHandler
-    public void on(final TransportsInitializedEvent event) {
+    public void on(final TransportsInitializedEvent event)
+    {
         final Message message = Message
             .builder()
             .withType("INFO")
             .withTextContent(event.getTransports().size() + " transports initialized")
             .build();
-        template.convertAndSend("/send", message);
+        template.convertAndSend(TOPIC_NAME, message);
     }
 
     @EventHandler
-    public void on(final PaymentFailedEvent event) {
+    public void on(final PaymentFailedEvent event)
+    {
         final Message message = Message
             .builder()
             .withType("ERROR")
             .withTextContent("Payment " + event.getPaymentId() + " failed")
             .build();
-        template.convertAndSend("/send", message);
+        template.convertAndSend(TOPIC_NAME, message);
     }
 
     @EventHandler
-    public void on(final PaymentConfirmedEvent event) {
+    public void on(final PaymentConfirmedEvent event)
+    {
         final Message message = Message
             .builder()
             .withType("SUCCESS")
             .withTextContent("Payment " + event.getPaymentId() + " succeeded")
             .build();
-        template.convertAndSend("/send", message);
+        template.convertAndSend(TOPIC_NAME, message);
     }
 
     @EventHandler
-    public void on(final AllReservationsConfirmedEvent event) {
+    public void on(final AllReservationsConfirmedEvent event)
+    {
         final Message message = Message
             .builder()
             .withType("SUCCESS")
             .withTextContent("Both hotel and transport reservations for trip " + event.getTripReservationId() + " have been confirmed")
             .build();
-        template.convertAndSend("/send", message);
+        template.convertAndSend(TOPIC_NAME, message);
     }
 
     @EventHandler
-    public void on(final HotelReservationEvent event) {
+    public void on(final HotelReservationEvent event)
+    {
         final var messageBuilder = Message.builder();
         final var hotelPrefix = "Hotel reservation for hotel ";
-        if(event.getStatus().equals(ReservationEventType.CONFIRMED)){
+        if (event.getStatus().equals(ReservationEventType.CONFIRMED))
+        {
             messageBuilder
                 .withType("SUCCESS")
                 .withTextContent(hotelPrefix + event.getHotelId() + " has been confirmed");
-        } else if(event.getStatus().equals(ReservationEventType.CANCELLED)) {
+        }
+        else if (event.getStatus().equals(ReservationEventType.CANCELLED))
+        {
             messageBuilder
                 .withType("ERROR")
                 .withTextContent(hotelPrefix + event.getHotelId() + " has failed");
-        } else if(event.getStatus().equals(ReservationEventType.FAILED)) {
+        }
+        else if (event.getStatus().equals(ReservationEventType.FAILED))
+        {
             messageBuilder
                 .withType("ERROR")
                 .withTextContent(hotelPrefix + event.getHotelId() + " has failed");
-        }else if (event.getStatus().equals(ReservationEventType.CREATED)){
+        }
+        else if (event.getStatus().equals(ReservationEventType.CREATED))
+        {
             messageBuilder
                 .withType("SUCCESS")
                 .withTextContent(hotelPrefix + event.getHotelId() + " is created");
         }
         final Message message = messageBuilder.build();
 
-        template.convertAndSend("/send", message);
+        template.convertAndSend(TOPIC_NAME, message);
     }
 
     @EventHandler
-    public void on(final TransportReservationEvent event){
+    public void on(final TransportReservationEvent event)
+    {
         final var messageBuilder = Message.builder();
         final var transportPrefix = "Transport reservation for transport ";
-        if(event.getStatus().equals(ReservationEventType.CONFIRMED)){
+        if (event.getStatus().equals(ReservationEventType.CONFIRMED))
+        {
             messageBuilder
                 .withType("SUCCESS")
-                .withTextContent( transportPrefix  + event.getTripReservationId() + " has been confirmed");
-        } else if(event.getStatus().equals(ReservationEventType.CANCELLED)) {
+                .withTextContent(transportPrefix + event.getTripReservationId() + " has been confirmed");
+        }
+        else if (event.getStatus().equals(ReservationEventType.CANCELLED))
+        {
             messageBuilder
                 .withType("ERROR")
                 .withTextContent(transportPrefix + event.getTripReservationId() + " has failed");
-        } else if(event.getStatus().equals(ReservationEventType.FAILED)) {
+        }
+        else if (event.getStatus().equals(ReservationEventType.FAILED))
+        {
             messageBuilder
                 .withType("ERROR")
                 .withTextContent(transportPrefix + event.getTripReservationId() + " has failed");
-        }else if (event.getStatus().equals(ReservationEventType.CREATED)){
+        }
+        else if (event.getStatus().equals(ReservationEventType.CREATED))
+        {
             messageBuilder
                 .withType("SUCCESS")
                 .withTextContent(transportPrefix + event.getTripReservationId() + " is created");
         }
         final Message message = messageBuilder.build();
 
-        template.convertAndSend("/send", message);
+        template.convertAndSend(TOPIC_NAME, message);
     }
-
-
 
 }

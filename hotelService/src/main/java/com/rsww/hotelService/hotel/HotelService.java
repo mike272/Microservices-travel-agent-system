@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,7 +48,7 @@ public class HotelService
             .toList();
     }
 
-    public List<com.rsww.dto.Hotel> initializeHotelsDatabase() throws IOException
+    public void initializeHotelsDatabase() throws IOException
     {
         final Reader reader = Files.newBufferedReader(Paths.get("./src/main/java/com/rsww/hotelService/hotel/scrapHotel.csv"));
         final CsvToBean<Hotel> csvToBean = new CsvToBeanBuilder<Hotel>(reader)
@@ -67,8 +68,7 @@ public class HotelService
         }
 
         hotelRepository.saveAll(hotelsSubList);
-        final var hotelsList = hotelsSubList.stream().map(this::mapToDtoHotel).toList();
+        final var hotelsList = new ArrayList<>(hotelsSubList.stream().map(this::mapToDtoHotel).toList());
         eventGateway.publish(HotelsInitializedEvent.builder().withHotels(hotelsList).build());
-        return hotelsList;
     }
 }

@@ -6,18 +6,25 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
+
 @Configuration
 @EnableWebSocketMessageBroker
-public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer
+{
 
     @Override
-    public void configureMessageBroker(final MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/subscribe");
-        config.setApplicationDestinationPrefixes("/send");
+    public void configureMessageBroker(final MessageBrokerRegistry config)
+    {
+        // topic for broadcasting messages
+        config.enableSimpleBroker("/topic");
+//        this is for the client to send messages to the server. We're not gonna use it
+        config.setApplicationDestinationPrefixes("/app");
     }
 
     @Override
-    public void registerStompEndpoints(final StompEndpointRegistry registry) {
-        registry.addEndpoint("/websocket").withSockJS();
+    public void registerStompEndpoints(final StompEndpointRegistry registry)
+    {
+        // endpoint for the client to connect to the server
+        registry.addEndpoint("/subscribe").setAllowedOriginPatterns("*").withSockJS();
     }
 }

@@ -1,5 +1,6 @@
 package com.rsww.events;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.rsww.dto.Hotel;
@@ -12,5 +13,5 @@ import lombok.Data;
 @Builder(setterPrefix = "with")
 public class HotelsInitializedEvent
 {
-    private List<Hotel> hotels;
+    private ArrayList<Hotel> hotels;
 }

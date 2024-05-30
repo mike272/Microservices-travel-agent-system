@@ -1,32 +1,67 @@
 import React, { useEffect, useState } from "react";
 import { Button, notification } from "antd";
 import { EventType } from "../utils/types";
+import { Client, Stomp } from "@stomp/stompjs";
+import SockJS from "sockjs-client";
 
 const EventsView = () => {
   const [events, setEvents] = useState<EventType[]>([]);
   const [isToggled, setIsToggled] = useState(true);
+  const [client, setClient] = useState<Client | null>(null);
 
   useEffect(() => {
-    const socket = new WebSocket(
-      process.env.API_GATEWAY_ADDRESS + "/websocket"
-    );
+    // const socket = new SockJS(
+    //   process.env.NEXT_PUBLIC_API_GATEWAY_ADDRESS + "/subscribe"
+    // );
+    // const stompClient = new Client({
+    //   webSocketFactory: () => socket,
+    // });
+    var url = process.env.NEXT_PUBLIC_API_GATEWAY_ADDRESS + "/subscribe";
+    var stompClient = null; //Stomp.client(url);
 
-    socket.onmessage = (event) => {
-      const eventData = JSON.parse(event.data) as EventType;
-      setEvents((prevEvents) => [...prevEvents, eventData]);
+    var socket = new SockJS(url);
+    stompClient = Stomp.over(socket);
+    stompClient.connect({}, function (frame) {
+      // setConnected(true);
+      console.log("Connected: " + frame);
+      stompClient.subscribe("/topic/messages", function (messageOutput) {
+        console.log(JSON.parse(messageOutput.body));
+      });
+    });
 
-      notification.open({
-        message: eventData.message,
-        type: eventData.type.toLowerCase() as
-          | "info"
-          | "success"
-          | "error"
-          | "warning",
+    stompClient.onConnect = () => {
+      console.log("WebSocket is connected.");
+
+      stompClient.subscribe("/topic/messages", (message) => {
+        if (message.body) {
+          const eventData = JSON.parse(message.body) as EventType;
+          setEvents((prevEvents) => [...prevEvents, eventData]);
+
+          notification.open({
+            message: eventData.message,
+            type: eventData.type.toLowerCase() as
+              | "info"
+              | "success"
+              | "error"
+              | "warning",
+          });
+        }
       });
     };
 
+    stompClient.onStompError = (error) => {
+      console.log(`WebSocket error: ${error}`);
+      console.log({ error });
+    };
+
+    stompClient.activate();
+
+    setClient(stompClient);
+
     return () => {
-      socket.close();
+      if (client) {
+        client.deactivate();
+      }
     };
   }, []);
 
