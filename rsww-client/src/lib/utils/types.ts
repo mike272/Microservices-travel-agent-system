@@ -35,17 +35,15 @@ type Hotel = {
 
 type Transportation = {
   id: number;
-  name: string;
-  description: string;
-  fromLocation: string;
-  toLocation: string;
-  fromDate: Date;
-  toDate: Date;
-  price: number;
-  rating: number;
-  reviews: number;
-  image: string;
-  availableSeats: number;
+  destinationCity: string;
+  departureCity: string;
+  destinationCountry: string;
+  departureCountry: string;
+  transportType: string;
+  departureDate: Date;
+  basePrice: number;
+  availablePlaces: number;
+  totalPlaces: number;
 };
 
 type EventType = {

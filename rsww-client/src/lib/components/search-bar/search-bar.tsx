@@ -15,21 +15,21 @@ import {
   setLocationPreferenceInformation,
 } from "@/lib/redux/reducers/bookingReducer";
 type Props = {
-  setTripsData: (data: any) => void;
-  setHotelsData: (data: any) => void;
-  setTransportData: (data: any) => void;
+  // setTripsData: (data: any) => void;
+  // setHotelsData: (data: any) => void;
+  // setTransportData: (data: any) => void;
 };
 
 export const SearchBar = (props: Props) => {
-  const { setTransportData } = props;
-  const [fromLocation, setFromLocation] = useState("");
-  const [toLocation, setToLocation] = useState("");
+  // const { setTransportData } = props;
+  const [fromLocation, setFromLocation] = useState("Warszawa");
+  const [toLocation, setToLocation] = useState("Grecja");
   const router = useRouter();
   const dispatch = useDispatch();
 
   const [fromDate, setFromDate] = useState<undefined | string>(undefined);
   const [toDate, setToDate] = useState<undefined | string>(undefined);
-  const [guests, setGuests] = useState({ adults: 0, children: 0, infants: 0 });
+  const [guests, setGuests] = useState({ adults: 2, children: 0, infants: 0 });
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const showModal = () => {
@@ -64,7 +64,7 @@ export const SearchBar = (props: Props) => {
     console.log({ data });
     let transportsResponse = data?.transports ?? [];
 
-    setTransportData(transportsResponse);
+    // setTransportData(transportsResponse);
     dispatch(setTransports(transportsResponse));
     router.push("/transports");
   }

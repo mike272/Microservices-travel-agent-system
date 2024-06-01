@@ -18,7 +18,14 @@ const transportsSlice = createSlice({
   initialState,
   reducers: {
     setTransports: (state, action) => {
-      state.transports = action.payload;
+      state.transports = action.payload.map((transport) => {
+        const date = new Date(transport.departureDate);
+        return {
+          ...transport,
+          departureDate: date,
+          arrivalDate: date,
+        };
+      });
     },
     setFromTransportation: (state, action) => {
       state.selectedFromtransport = action.payload;
