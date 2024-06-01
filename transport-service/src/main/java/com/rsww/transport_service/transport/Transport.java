@@ -29,18 +29,32 @@ public class Transport
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     //City,Country,Departure City,Departure Date,Return Date,Transport,Total Transport Places,Transport Prices aDULT,Transport Prices Baby,Transport Prices Kid,Transport Prices Teenanger
+    @CsvBindByName(column = "departureCity")
     private String departureCity;
+
+    @CsvBindByName(column = "destinationCity")
     private String destinationCity;
-    private String targetCity;
-    private String targetCountry;
+
+    @CsvBindByName(column = "departureCountry")
+    private String departureCountry;
+
+    @CsvBindByName(column = "destinationCountry")
+    private String destinationCountry;
+
     @CsvBindByName(column = "departureDate")
     @CsvDate("yyyy-MM-dd")
     private Date departureDate;
-    @CsvBindByName(column = "departureDate")
-    @CsvDate("yyyy-MM-dd")
+
+    @CsvBindByName(column = "transportType")
     private TransportTypeEnum transportType;
-    private int basePrice;
+
+    @CsvBindByName(column = "basePrice")
+    private Double basePrice;
+
+    @CsvBindByName(column = "totalPlaces")
     private int totalPlaces;
+
+    @CsvBindByName(column = "availablePlaces")
     private int availablePlaces;
 
 }

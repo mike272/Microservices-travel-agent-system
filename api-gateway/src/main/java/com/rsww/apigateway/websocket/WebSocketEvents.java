@@ -24,9 +24,9 @@ public class WebSocketEvents
         final Message message = Message
             .builder()
             .withType("INFO")
-            .withTextContent("You are now connected to the WebSocket")
+            .withTextContent("New WebSocket connection established")
             .build();
-        template.convertAndSendToUser(event.getUser().getName(), "/app/send", message);
+        template.convertAndSend("/app/send", message);
     }
 
     @EventListener
@@ -35,8 +35,8 @@ public class WebSocketEvents
         final Message message = Message
             .builder()
             .withType("INFO")
-            .withTextContent("acs")
+            .withTextContent("error subscribing to the WebSocket")
             .build();
-        template.convertAndSendToUser(event.getUser().getName(), "/app/send", message);
+        template.convertAndSend("/app/send", message);
     }
 }

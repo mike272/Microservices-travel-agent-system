@@ -1,5 +1,6 @@
 package com.rsww.responses;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.rsww.dto.Room;
@@ -19,5 +20,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AvailableRoomsResponse
 {
-    private List<Room> rooms;
+    private ArrayList<Room> rooms;
 }

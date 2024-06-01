@@ -45,6 +45,7 @@ public class AxonEventHandler
     @EventHandler
     public void on(final TransportsInitializedEvent event)
     {
+        logger.info("Received event: TransportsInitializedEvent");
         final Message message = Message
             .builder()
             .withType("INFO")

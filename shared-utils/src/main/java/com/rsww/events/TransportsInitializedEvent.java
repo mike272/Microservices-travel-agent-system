@@ -1,6 +1,6 @@
 package com.rsww.events;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import com.rsww.dto.Transport;
 
@@ -12,5 +12,5 @@ import lombok.Data;
 @Builder(setterPrefix = "with")
 public class TransportsInitializedEvent
 {
-    private List<Transport> transports;
+    private ArrayList<Transport> transports;
 }

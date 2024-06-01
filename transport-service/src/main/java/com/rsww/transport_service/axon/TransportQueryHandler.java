@@ -14,22 +14,24 @@ import com.rsww.transport_service.transport.TransportService;
 
 
 @Service
-public class TransportQueryHandler {
+public class TransportQueryHandler
+{
     private final TransportService transportService;
     private final EventGateway eventGateway;
     private final CommandGateway commandGateway;
 
-
     public TransportQueryHandler(final TransportService transportService,
                                  final EventGateway eventGateway,
-                                 final CommandGateway commandGateway) {
+                                 final CommandGateway commandGateway)
+    {
         this.transportService = transportService;
         this.eventGateway = eventGateway;
         this.commandGateway = commandGateway;
     }
 
     @QueryHandler
-    public List<Transport> handle(final TransportSearchQuery query) {
+    public AvailableTransportsResponse handle(final TransportSearchQuery query)
+    {
         return transportService.findAvailableTransports(query.getFromLocation(),
             query.getToLocation(),
             query.getFromDate(),

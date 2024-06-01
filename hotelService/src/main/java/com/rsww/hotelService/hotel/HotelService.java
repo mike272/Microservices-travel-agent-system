@@ -39,9 +39,9 @@ public class HotelService
             .build();
     }
 
-    public List<com.rsww.dto.Hotel> getHotelsByLocation(final String location)
+    public ArrayList<com.rsww.dto.Hotel> getHotelsByLocation(final String location)
     {
-        return hotelRepository
+        return (ArrayList<com.rsww.dto.Hotel>) hotelRepository
             .findHotelsByLocation(location)
             .stream()
             .map(this::mapToDtoHotel)

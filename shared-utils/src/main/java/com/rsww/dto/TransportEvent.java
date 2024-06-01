@@ -17,12 +17,22 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TransportEvent
 {
-    private int transportId; // links to scheduled transport details
-    private String transportType; // type of transport
+    private int id;
     private Date departureDate;
+    /*
+     * do not use, for simplicity we assume that the arrival date is the same as the departure date
+     */
     private Date arrivalDate;
-    private int availableSeats;
-    private double pricePerSeat;
-    private String departureLocation;
-    private String arrivalLocation;
+    private int totalNumberOfSeats;
+    private TransportTypeEnum transportType;
+    private int period; // in days. 7=runs every week. 1=runs every day
+
+    private String departureCity;
+    private String destinationCity;
+    private String departureCountry;
+    private String destinationCountry;
+
+    private int basePrice;
+    private int totalPlaces;
+    private int availablePlaces;
 }

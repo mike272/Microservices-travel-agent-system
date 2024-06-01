@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.rsww.apigateway.service.CommandService;
 import com.rsww.apigateway.service.QueryService;
-import com.rsww.responses.AvailableHotelsResponse;
 import com.rsww.responses.AvailableTransportsResponse;
 
 import lombok.Data;
@@ -31,14 +30,15 @@ public class TransportController
     private final QueryService queryService;
     private final CommandService commandService;
 
-    private Date getTomorrowDate() {
+    private Date getTomorrowDate()
+    {
         final Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DAY_OF_YEAR, 1);
         return calendar.getTime();
     }
 
-    @GetMapping(value="/search")
-    public AvailableTransportsResponse searchHotels(
+    @GetMapping(value = "/search")
+    public AvailableTransportsResponse searchTransports(
         @RequestParam(required = false) final String fromDate,
         @RequestParam(required = false) final String toDate,
         @RequestParam(required = false) final String fromLocation,
@@ -48,12 +48,12 @@ public class TransportController
         @RequestParam(required = false) final Integer infants
     ) throws ExecutionException, InterruptedException, TimeoutException
     {
-        logger.info("Received HotelSearchQuery with toLocation: {}, fromDate: {}, toDate: {}", toLocation, fromDate, toDate);
+        logger.info("Received TransportSearchQuery from: {}, to: {}, fromDate: {}, toDate: {}", fromLocation, toLocation, fromDate, toDate);
         return queryService.forwardSearchTransports(
             fromLocation,
             toLocation,
             fromDate == null || fromDate.isEmpty() ? new Date() : new Date(fromDate),
-            toDate == null || toDate.isEmpty() ? getTomorrowDate() : new Date(toDate),
+            toDate == null || toDate.isEmpty() ? new Date() : new Date(toDate),
             adults,
             children,
             infants

@@ -1,4 +1,4 @@
-targetCity,targetCountry,departureCity,departureDate,returnDate,transportType,totalPlaces,basePrice,Transport Prices Baby,Transport Prices Kid,Transport Prices Teenanger
+destinationCity,destinationCountry,departureCity,departureDate,returnDate,transportType,totalPlaces,basePrice,Transport Prices Baby,Transport Prices Kid,Transport Prices Teenanger
 Zakynthos,Grecja,Warszawa,2024-06-04,2024-05-28,BUS,88,819.39,101.82,218.4,429.16
 Zakynthos,Grecja,Warszawa,2024-06-04,2024-05-28,FLIGHT,88,129.03,28.04,47.49,83.02
 Zakynthos,Grecja,Gdańsk,2024-06-04,2024-05-28,BUS,69,871.58,101.25,232.34,447.43

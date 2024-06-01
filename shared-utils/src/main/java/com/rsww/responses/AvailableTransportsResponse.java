@@ -1,7 +1,9 @@
 package com.rsww.responses;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.rsww.dto.Transport;
 import com.rsww.dto.TransportEvent;
 
 import lombok.AllArgsConstructor;
@@ -19,5 +21,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AvailableTransportsResponse
 {
-    private List<TransportEvent> transports;
+    private ArrayList<Transport> transports;
 }
