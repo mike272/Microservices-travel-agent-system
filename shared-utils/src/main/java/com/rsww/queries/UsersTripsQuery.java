@@ -1,5 +1,6 @@
-package com.rsww.commands;
+package com.rsww.queries;
 
+import java.util.ArrayList;
 
 import com.rsww.dto.Trip;
 
@@ -9,11 +10,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
+/**
+ * Query object for getting trips for a user
+ */
 @Data
 @Builder(setterPrefix = "with")
-@AllArgsConstructor
 @NoArgsConstructor
-public class ReserveTripCommand
+@AllArgsConstructor
+public class UsersTripsQuery
 {
-    private Trip trip;
+    private int customerId;
 }
