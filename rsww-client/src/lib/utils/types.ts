@@ -18,19 +18,13 @@ type Room = {
 type Hotel = {
   id: number;
   name: string;
-  stars: number;
-  about: string;
-  areKidsAllowed: boolean;
+  starsNum: number;
+  arechildrenAllowed: boolean;
   rooms: number;
   city: string;
+  country: string;
   description: string;
-  location: string;
-  fromDate: Date;
-  toDate: Date;
-  price: number;
-  rating: number;
-  reviews: number;
-  image: string;
+  minPrice: number;
 };
 
 type Transportation = {

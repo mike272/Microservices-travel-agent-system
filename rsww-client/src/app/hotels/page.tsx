@@ -9,11 +9,12 @@ import hotel3Image from "../../../public/hotel3.png";
 import { searchHotels } from "@/lib/api/search-api";
 import { Button } from "antd";
 import { Hotel } from "@/lib/utils/types";
+import { setHotels } from "@/lib/redux/reducers/hotelsReducer";
 
 export default function Hotels() {
   const hotels = useSelector((state: RootState) => state.hotels.hotels);
   const bookingPreferences = useSelector((state: RootState) => state.booking);
-
+  const dispatch = useDispatch();
   async function fetchHotels() {
     const response = await searchHotels(
       bookingPreferences.toLocation,
@@ -25,6 +26,8 @@ export default function Hotels() {
         infants: bookingPreferences.infants,
       }
     );
+    console.log({ response, hotels });
+    dispatch(setHotels(response?.hotels));
   }
 
   useEffect(() => {
@@ -44,8 +47,10 @@ export default function Hotels() {
   }) {
     return (
       <li key={hotel.id}>
-        <div className="mb-6 flex flex-row justify-between align-middle rounded-lg border border-solid border-gray-600">
+        <div className="mb-6 flex flex-row justify-between h-40 align-middle rounded-lg border border-solid border-gray-600">
           <img
+            width={200}
+            height={160}
             src={
               index % 3 === 0
                 ? hotel1Image.src
@@ -54,20 +59,26 @@ export default function Hotels() {
                 : hotel3Image.src
             }
             alt="Hotel"
-            style={{ borderRadius: "10px" }}
+            style={{
+              borderRadius: "10px",
+              width: "200px",
+              height: "160px",
+              minWidth: "200px",
+              minHeight: "160px",
+              marginRight: "15px",
+            }}
           />
           <div className="flex flex-col mr-8">
             <div className="font-normal text-xl">{hotel.name}</div>
             <div className="font-normal text-lg">
-              {hotel.city}, {hotel.location}
+              {hotel.city}, {hotel.country}
             </div>
           </div>
           <div className="flex flex-col mr-8">
             <div className="font-normal text-lg">{hotel.description}</div>
           </div>
           <div className="flex flex-col mr-8">
-            <p>Price per night: ${hotel.price}</p>
-            <p>Rating: {hotel.rating}</p>
+            <p>Price per night: ${hotel.minPrice}</p>
             <p>Rooms: {hotel.rooms}</p>
           </div>
 

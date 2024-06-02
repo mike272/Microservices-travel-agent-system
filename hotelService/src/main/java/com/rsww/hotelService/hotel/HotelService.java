@@ -48,11 +48,11 @@ public class HotelService
 
     public ArrayList<com.rsww.dto.Hotel> getHotelsByLocation(final String location)
     {
-        final var hotels = (ArrayList<com.rsww.dto.Hotel>) hotelRepository
+        final var hotels = new ArrayList<>(hotelRepository
             .findHotelsByLocation(location)
             .stream()
             .map(this::mapToDtoHotel)
-            .toList();
+            .toList());
 
         hotels.forEach(hotel -> {
             final var rooms = roomService.getAvailableRoomsForHotel(hotel.getId());
