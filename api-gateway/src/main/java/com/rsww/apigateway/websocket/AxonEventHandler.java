@@ -13,6 +13,7 @@ import com.rsww.events.HotelReservationEvent;
 import com.rsww.events.HotelsInitializedEvent;
 import com.rsww.events.PaymentConfirmedEvent;
 import com.rsww.events.PaymentFailedEvent;
+import com.rsww.events.RoomsInitializedEvent;
 import com.rsww.events.TransportReservationEvent;
 import com.rsww.events.TransportsInitializedEvent;
 
@@ -38,6 +39,18 @@ public class AxonEventHandler
             .builder()
             .withType("INFO")
             .withTextContent(event.getHotels().size() + " hotels initialized")
+            .build();
+        template.convertAndSend(TOPIC_NAME, message);
+    }
+
+    @EventHandler
+    public void on(final RoomsInitializedEvent event)
+    {
+        logger.info("Received event: RoomsInitializedEvent");
+        final Message message = Message
+            .builder()
+            .withType("INFO")
+            .withTextContent(event.getNumberOfRooms() + " rooms initialized")
             .build();
         template.convertAndSend(TOPIC_NAME, message);
     }

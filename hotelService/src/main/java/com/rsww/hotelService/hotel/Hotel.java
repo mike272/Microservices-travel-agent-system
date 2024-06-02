@@ -1,5 +1,9 @@
 package com.rsww.hotelService.hotel;
 
+import java.util.List;
+
+import com.rsww.hotelService.room.Room;
+
 import jakarta.persistence.*;
 
 import lombok.AllArgsConstructor;
@@ -27,7 +31,9 @@ public class Hotel
     private boolean areChildrenAllowed;
     @Column(length = 10000)
     private String description;
+    private double minPrice;
 
-//    @OneToMany(mappedBy = "hotel")
-//    private List<Room> rooms;
+    private transient String roomsTmp;
+    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Room> rooms;
 }
