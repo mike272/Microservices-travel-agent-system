@@ -9,9 +9,14 @@ import hotel3Image from "../../../public/hotel3.png";
 import { searchHotels } from "@/lib/api/search-api";
 import { Button } from "antd";
 import { Hotel } from "@/lib/utils/types";
-import { setHotels } from "@/lib/redux/reducers/hotelsReducer";
+import {
+  setHotels,
+  setSelectedHotel,
+} from "@/lib/redux/reducers/hotelsReducer";
+import { useRouter } from "next/navigation";
 
 export default function Hotels() {
+  const router = useRouter();
   const hotels = useSelector((state: RootState) => state.hotels.hotels);
   const bookingPreferences = useSelector((state: RootState) => state.booking);
   const dispatch = useDispatch();
@@ -36,7 +41,7 @@ export default function Hotels() {
     }
   }, []);
 
-  function FlightRow({
+  function HotelListItem({
     hotel,
     onClick,
     index,
@@ -93,15 +98,21 @@ export default function Hotels() {
     );
   }
 
+  function onSelectHotel(hotel: Hotel) {
+    console.log("Selected hotel", hotel);
+    dispatch(setSelectedHotel(hotel));
+    router.push("/payment");
+  }
+
   return (
     <div>
       <h1>Hotels</h1>
       <ul>
         {hotels?.map((hotel, index) => (
-          <FlightRow
+          <HotelListItem
             key={index}
             hotel={hotel}
-            onClick={() => console.log("Selected hotel", hotel)}
+            onClick={() => onSelectHotel(hotel)}
             index={index}
           />
         ))}

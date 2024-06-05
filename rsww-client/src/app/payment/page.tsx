@@ -1,3 +1,4 @@
+import { reserveTrip } from "@/lib/api/reserve-api";
 import { RootState } from "@/lib/redux/store";
 import { Button, Card } from "antd";
 import { useSelector } from "react-redux";
@@ -12,10 +13,16 @@ export default function Payment() {
   const selectedHotel = useSelector(
     (state: RootState) => state.hotels.selectedHotel
   );
-  const numberOfGuests = useSelector(
-    (state: RootState) =>
-      state.booking.adults + state.booking.children + state.booking.infants
+  const numberOfAdults = useSelector(
+    (state: RootState) => state.booking.adults
   );
+  const numberOfChildren = useSelector(
+    (state: RootState) => state.booking.children
+  );
+  const numberOfInfants = useSelector(
+    (state: RootState) => state.booking.infants
+  );
+  const numberOfGuests = numberOfAdults + numberOfChildren + numberOfInfants;
   console.log({
     selectedOutBoundFlight,
     selectedReturnFlight,
@@ -56,6 +63,19 @@ export default function Payment() {
           borderColor: "green",
           marginTop: "20px",
         }}
+        onClick={() =>
+          reserveTrip(
+            selectedHotel.id,
+            selectedOutBoundFlight.id,
+            selectedReturnFlight.id,
+            1,
+            selectedOutBoundFlight.departureDate.toISOString(),
+            selectedReturnFlight.departureDate.toISOString(),
+            numberOfAdults,
+            numberOfChildren,
+            numberOfInfants
+          )
+        }
       >
         Pay
       </Button>
