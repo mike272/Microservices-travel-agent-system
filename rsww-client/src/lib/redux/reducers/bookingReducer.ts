@@ -8,7 +8,7 @@ interface BookingState {
   toDate: string;
   fromLocation: string;
   toLocation: string;
-  reservationId: string;
+  reservationId: number | null;
   reservationStatus: string;
 }
 
@@ -20,7 +20,7 @@ const initialState: BookingState = {
   toDate: "",
   fromLocation: "",
   toLocation: "",
-  reservationId: "",
+  reservationId: null,
   reservationStatus: "",
 };
 
@@ -83,6 +83,12 @@ const bookingSlice = createSlice({
       state.fromLocation = action.payload.fromLocation;
       state.toLocation = action.payload.toLocation;
     },
+    setReservationId: (state, action: PayloadAction<number>) => {
+      state.reservationId = action.payload;
+    },
+    setReservationStatus: (state, action: PayloadAction<string>) => {
+      state.reservationStatus = action.payload;
+    },
   },
 });
 
@@ -92,5 +98,7 @@ export const {
   setGuestsPreferenceInformation,
   setDatePreferenceInformation,
   setLocationPreferenceInformation,
+  setReservationId,
+  setReservationStatus,
 } = bookingSlice.actions;
 export default bookingSlice.reducer;

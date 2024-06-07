@@ -3,12 +3,18 @@ import { Button, notification } from "antd";
 import { EventType } from "../utils/types";
 import { Client, Stomp } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../redux/store";
+import { setReservationStatus } from "../redux/reducers/bookingReducer";
 
 const EventsView = () => {
   const [events, setEvents] = useState<EventType[]>([]);
   const [isToggled, setIsToggled] = useState(true);
   const [client, setClient] = useState<Client | null>(null);
-
+  const bookingId = useSelector(
+    (state: RootState) => state.booking.reservationId
+  );
+  const dispatch = useDispatch();
   useEffect(() => {
     // const socket = new SockJS(
     //   process.env.NEXT_PUBLIC_API_GATEWAY_ADDRESS + "/subscribe"
@@ -35,6 +41,14 @@ const EventsView = () => {
       stompClient.subscribe("/topic/messages", (message) => {
         if (message.body) {
           const eventData = JSON.parse(message.body) as EventType;
+          if (eventData?.tripReservationId === bookingId) {
+            notification.open({
+              message: "Your reservation has been confirmed",
+              type: "success",
+            });
+            dispatch(setReservationStatus(eventData.status));
+          }
+
           setEvents((prevEvents) => [...prevEvents, eventData]);
 
           notification.open({

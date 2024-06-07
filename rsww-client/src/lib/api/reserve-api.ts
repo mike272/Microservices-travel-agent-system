@@ -8,7 +8,10 @@ async function reserveTrip(
   adults: number,
   children: number,
   infants: number
-) {
+): Promise<{
+  reservationId: number;
+  reservationStatus: string;
+}> {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API_GATEWAY_ADDRESS}/v1/trips/reserve`,
     {

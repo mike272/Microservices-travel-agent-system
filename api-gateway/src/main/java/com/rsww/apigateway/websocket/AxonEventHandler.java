@@ -94,6 +94,7 @@ public class AxonEventHandler
     {
         final Message message = Message
             .builder()
+            .withTripReservationId(event.getTripReservationId())
             .withType("SUCCESS")
             .withTextContent("Both hotel and transport reservations for trip " + event.getTripReservationId() + " have been confirmed")
             .build();
