@@ -41,4 +41,23 @@ async function reserveTrip(
   return data;
 }
 
-export { reserveTrip };
+async function pay(tripReservationId: number): Promise<void> {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_GATEWAY_ADDRESS}/v1/trips/pay`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        tripReservationId,
+      }),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(`API request failed with status ${response.status}`);
+  }
+}
+
+export { reserveTrip, pay };

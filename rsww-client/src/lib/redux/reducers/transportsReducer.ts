@@ -9,8 +9,30 @@ interface TransportState {
 
 const initialState: TransportState = {
   transports: [],
-  selectedFromtransport: null,
-  selectedTotransport: null,
+  selectedFromtransport: {
+    id: 8759,
+    destinationCity: "Zakynthos",
+    departureCity: "Gdańsk",
+    destinationCountry: "Grecja",
+    departureCountry: "Polska",
+    transportType: "FLIGHT",
+    departureDate: new Date(),
+    basePrice: 80,
+    availablePlaces: 10,
+    totalPlaces: 10,
+  },
+  selectedTotransport: {
+    id: 9259,
+    departureCity: "Zakynthos",
+    destinationCity: "Gdańsk",
+    departureCountry: "Grecja",
+    destinationCountry: "Polska",
+    transportType: "FLIGHT",
+    departureDate: new Date(),
+    basePrice: 80,
+    availablePlaces: 10,
+    totalPlaces: 10,
+  },
 };
 
 const transportsSlice = createSlice({

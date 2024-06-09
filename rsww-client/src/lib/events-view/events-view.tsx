@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button, notification } from "antd";
 import { EventType } from "../utils/types";
 import { Client, Stomp } from "@stomp/stompjs";
@@ -11,56 +11,90 @@ const EventsView = () => {
   const [events, setEvents] = useState<EventType[]>([]);
   const [isToggled, setIsToggled] = useState(true);
   const [client, setClient] = useState<Client | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
   const bookingId = useSelector(
     (state: RootState) => state.booking.reservationId
   );
   const dispatch = useDispatch();
-  useEffect(() => {
-    // const socket = new SockJS(
-    //   process.env.NEXT_PUBLIC_API_GATEWAY_ADDRESS + "/subscribe"
-    // );
-    // const stompClient = new Client({
-    //   webSocketFactory: () => socket,
-    // });
-    var url = process.env.NEXT_PUBLIC_API_GATEWAY_ADDRESS + "/subscribe";
-    var stompClient = null; //Stomp.client(url);
 
+  const subscriptionRef = useRef(null);
+
+  useEffect(() => {
+    if (client && isConnected) {
+      return;
+    }
+
+    var url = process.env.NEXT_PUBLIC_API_GATEWAY_ADDRESS + "/subscribe";
+    var stompClient = null;
     var socket = new SockJS(url);
     stompClient = Stomp.over(socket);
+
     stompClient.connect({}, function (frame) {
-      // setConnected(true);
-      console.log("Connected: " + frame);
-      stompClient.subscribe("/topic/messages", function (messageOutput) {
-        console.log(JSON.parse(messageOutput.body));
-      });
+      if (!isConnected) {
+        console.log("Connected: " + frame);
+        if (subscriptionRef.current) {
+          return;
+        }
+
+        // Subscribe and store subscription in ref
+      }
+      setIsConnected(true);
     });
 
     stompClient.onConnect = () => {
       console.log("WebSocket is connected.");
+      subscriptionRef.current = subscriptionRef.current = stompClient.subscribe(
+        "/topic/messages",
+        (message) => {
+          if (message.body) {
+            const eventData = JSON.parse(message.body) as EventType;
+            if (eventData?.tripReservationId === bookingId) {
+              notification.open({
+                message: "Your reservation has been confirmed",
+                type: "success",
+              });
+              dispatch(setReservationStatus(eventData.status));
+            }
+            console.log({ eventData });
+            setEvents((prevEvents) => [...prevEvents, eventData]);
 
-      stompClient.subscribe("/topic/messages", (message) => {
-        if (message.body) {
-          const eventData = JSON.parse(message.body) as EventType;
-          if (eventData?.tripReservationId === bookingId) {
             notification.open({
-              message: "Your reservation has been confirmed",
-              type: "success",
+              message: eventData.textContent,
+              type: eventData.type.toLowerCase() as
+                | "info"
+                | "success"
+                | "error"
+                | "warning",
             });
-            dispatch(setReservationStatus(eventData.status));
           }
-
-          setEvents((prevEvents) => [...prevEvents, eventData]);
-
-          notification.open({
-            message: eventData.textContent,
-            type: eventData.type.toLowerCase() as
-              | "info"
-              | "success"
-              | "error"
-              | "warning",
-          });
         }
-      });
+      );
+      // subscriptionRef.current = stompClient.subscribe(
+      //   "/topic/messages",
+      //   (message) => {
+      //     if (message.body) {
+      //       const eventData = JSON.parse(message.body) as EventType;
+      //       if (eventData?.tripReservationId === bookingId) {
+      //         notification.open({
+      //           message: "Your reservation has been confirmed",
+      //           type: "success",
+      //         });
+      //         dispatch(setReservationStatus(eventData.status));
+      //       }
+      //       console.log({ eventData });
+      //       setEvents((prevEvents) => [...prevEvents, eventData]);
+
+      //       notification.open({
+      //         message: eventData.textContent,
+      //         type: eventData.type.toLowerCase() as
+      //           | "info"
+      //           | "success"
+      //           | "error"
+      //           | "warning",
+      //       });
+      //     }
+      //   }
+      // );
     };
 
     stompClient.onStompError = (error) => {
@@ -75,6 +109,10 @@ const EventsView = () => {
     return () => {
       if (client) {
         client.deactivate();
+      }
+      if (subscriptionRef.current) {
+        subscriptionRef.current.unsubscribe();
+        subscriptionRef.current = null;
       }
     };
   }, []);
@@ -121,6 +159,8 @@ const EventsView = () => {
               key={index}
               type={event.type}
               textContent={event.textContent}
+              tripReservationId={event?.tripReservationId}
+              status={event?.status}
             />
           ))}
       </div>

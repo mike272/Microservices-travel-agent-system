@@ -1,4 +1,5 @@
-import { reserveTrip } from "@/lib/api/reserve-api";
+"use client";
+import { pay, reserveTrip } from "@/lib/api/reserve-api";
 import {
   setReservationId,
   setReservationStatus,
@@ -14,6 +15,9 @@ export default function Payment() {
   const router = useRouter();
   const reservationStatus = useSelector(
     (state: RootState) => state.booking.reservationStatus
+  );
+  const tripReservationId = useSelector(
+    (state: RootState) => state.booking.reservationId
   );
   const selectedOutBoundFlight = useSelector(
     (state: RootState) => state.transports.selectedFromtransport
@@ -41,11 +45,12 @@ export default function Payment() {
     selectedHotel,
   });
 
-  const lengthOfStay = Math.ceil(
-    (selectedReturnFlight.departureDate.getTime() -
-      selectedOutBoundFlight.departureDate.getTime()) /
-      (1000 * 60 * 60 * 24)
-  );
+  const lengthOfStay =
+    Math.ceil(
+      (selectedReturnFlight?.departureDate?.getTime() -
+        selectedOutBoundFlight?.departureDate?.getTime()) /
+        (1000 * 60 * 60 * 24)
+    ) ?? 5;
 
   useEffect(() => {
     if (reservationStatus === "PAID") {
@@ -54,25 +59,45 @@ export default function Payment() {
     }
   }, [reservationStatus, router]);
 
+  const formatDateToDDMMYY = (date) => {
+    const d = new Date(date);
+    const day = d.getDate().toString().padStart(2, "0");
+    const month = (d.getMonth() + 1).toString().padStart(2, "0"); // JavaScript months are 0-based.
+    const year = d.getFullYear().toString().slice(-2); // Get the last two digits of the year.
+
+    return `${day}/${month}/${year}`;
+  };
+
   return (
     <div>
       <h1>Payment</h1>
       <Card title="Summary" style={{ width: 300 }}>
         <div>
-          Outbound Flight: {selectedOutBoundFlight.departureDate.toDateString()}
+          Outbound Flight:{" "}
+          {selectedOutBoundFlight?.departureDate?.toDateString() ?? "-"}
         </div>
         <div>
-          Return Flight: {selectedReturnFlight.departureDate.toDateString()}
+          Return Flight:{" "}
+          {selectedReturnFlight?.departureDate?.toDateString() ?? "-"}
         </div>
 
-        <div>Hotel: {selectedHotel.name}</div>
-        <div>Hotel Price: {selectedHotel.minPrice * lengthOfStay}</div>
+        <div>Hotel: {selectedHotel?.name}</div>
+        <div>Hotel Price: {selectedHotel?.minPrice ?? 100 * lengthOfStay}</div>
         <div>
           Total Price:{" "}
-          {selectedHotel.minPrice * lengthOfStay +
-            numberOfGuests * selectedOutBoundFlight.basePrice +
-            numberOfGuests * selectedReturnFlight.basePrice}
+          {selectedHotel?.minPrice ??
+            100 * lengthOfStay +
+              numberOfGuests * selectedOutBoundFlight?.basePrice ??
+            300 + numberOfGuests * selectedReturnFlight?.basePrice ??
+            400}
         </div>
+      </Card>
+      <Card title="Payment" style={{ width: 300 }}>
+        <div>
+          Your reservation is created for 180 seconds. Reservation id:{" "}
+          {tripReservationId}
+        </div>
+        <div>Please pay within 180 seconds to confirm your reservation.</div>
       </Card>
       <Button
         type="primary"
@@ -92,8 +117,8 @@ export default function Payment() {
               selectedOutBoundFlight.id,
               selectedReturnFlight.id,
               1,
-              selectedOutBoundFlight.departureDate.toISOString(),
-              selectedReturnFlight.departureDate.toISOString(),
+              formatDateToDDMMYY(selectedOutBoundFlight.departureDate),
+              formatDateToDDMMYY(selectedReturnFlight.departureDate),
               numberOfAdults,
               numberOfChildren,
               numberOfInfants
@@ -107,8 +132,33 @@ export default function Payment() {
           }
         }}
       >
-        Pay
+        Reserve
       </Button>
+      {true && (
+        <Button
+          type="primary"
+          loading={isLoading}
+          disabled={isLoading}
+          size="large"
+          style={{
+            backgroundColor: "green",
+            borderColor: "green",
+            marginTop: "20px",
+          }}
+          onClick={async () => {
+            setIsLoading(true);
+            try {
+              const response = await pay(tripReservationId);
+            } catch (e) {
+              console.log(e);
+            } finally {
+              setIsLoading(false);
+            }
+          }}
+        >
+          Pay
+        </Button>
+      )}
     </div>
   );
 }
