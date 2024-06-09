@@ -56,5 +56,4 @@ public class Transport
 
     @CsvBindByName(column = "availablePlaces")
     private int availablePlaces;
-
 }
