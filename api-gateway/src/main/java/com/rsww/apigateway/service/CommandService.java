@@ -14,6 +14,8 @@ import com.rsww.commands.InitializeTransportsCommand;
 import com.rsww.commands.ReserveHotelCommand;
 import com.rsww.commands.ReserveTripCommand;
 import com.rsww.dto.ReservationConfirmation;
+import com.rsww.dto.Trip;
+import com.rsww.events.PaymentConfirmedEvent;
 
 
 @Service
@@ -27,15 +29,14 @@ public class CommandService
         this.commandGateway = commandGateway;
     }
 
-    private ReservationConfirmation reserveTrip(final int tripId, final int hotelId, final int transportEventId)
+    public ReservationConfirmation reserveTrip(final Trip trip)
         throws ExecutionException, InterruptedException, TimeoutException
     {
         final ReserveTripCommand reserveTripCommand = ReserveTripCommand
             .builder()
-            .withTripId(tripId)
-            .withHotelId(hotelId)
-            .withTransportId(transportEventId)
+            .withTrip(trip)
             .build();
+
         final ReservationConfirmation reservationData = (ReservationConfirmation) commandGateway.send(reserveTripCommand).get(10, TimeUnit.SECONDS);
         logger.info("Reservation ID: {}", reservationData);
         return reservationData;

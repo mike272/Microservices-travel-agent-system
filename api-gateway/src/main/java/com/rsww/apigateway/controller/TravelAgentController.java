@@ -9,6 +9,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.axonframework.eventhandling.gateway.EventGateway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +24,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 //import com.rsww.apigateway.query.TripSearchQuery;
+import com.rsww.apigateway.service.CommandService;
 import com.rsww.apigateway.service.QueryService;
+import com.rsww.commands.ReserveTripCommand;
+import com.rsww.dto.ReservationConfirmation;
 import com.rsww.dto.Room;
 import com.rsww.dto.Trip;
+import com.rsww.events.PaymentConfirmedEvent;
+import com.rsww.events.PaymentFailedEvent;
 import com.rsww.queries.TripSearchQuery;
 
 import lombok.Data;
@@ -40,8 +46,16 @@ public class TravelAgentController
     private static final Logger logger = LoggerFactory.getLogger(TravelAgentController.class);
     SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yy");
 
-    @Autowired
     private final QueryService queryService;
+    private final CommandService commandService;
+    private final EventGateway eventGateway;
+
+    public TravelAgentController(final QueryService queryService, final CommandService commandService, final EventGateway eventGateway)
+    {
+        this.queryService = queryService;
+        this.commandService = commandService;
+        this.eventGateway = eventGateway;
+    }
 
     private Date getTomorrowDate()
     {
@@ -138,6 +152,78 @@ public class TravelAgentController
         catch (NumberFormatException e)
         {
             throw new IllegalArgumentException("Invalid transportId: " + transportId);
+        }
+    }
+
+    @PostMapping(value = "/reserve")
+    public ResponseEntity<ReservationConfirmation> reserveTrip(@RequestBody final ReservationRequest body
+
+    ) throws ExecutionException, InterruptedException, TimeoutException
+    {
+        final int hotelId = body.getHotelId();
+        final int outgoingTransportId = body.getOutgoingTransportId();
+        final int returnTransportId = body.getReturnTransportId();
+        final int customerId = body.getCustomerId();
+        final String fromDate = body.getFromDate();
+        final String toDate = body.getToDate();
+
+        final int adults = body.getAdults();
+        final int children = body.getChildren();
+        final int infants = body.getInfants();
+        Date fromDateCast;
+        Date toDateCast;
+        try
+        {
+            fromDateCast = fromDate == null || fromDate.isEmpty() ? new Date() : new Date(fromDate);
+            toDateCast = toDate == null || toDate.isEmpty() ? getTomorrowDate() : new Date(toDate);
+        }
+        catch (final Exception e)
+        {
+            logger.error("Error parsing date: ", e);
+            fromDateCast = new Date();
+            toDateCast = getTomorrowDate();
+        }
+
+        final Trip trip = Trip.builder()
+            .withHotelId(hotelId)
+            .withCustomerId(customerId)
+            .withNumberOfAdults(adults)
+            .withNumberOfChildren(children)
+            .withNumberOfInfants(infants)
+            .withOutboundDate(fromDateCast)
+            .withReturnDate(toDateCast)
+            .withOutboundTransportId(outgoingTransportId)
+            .withReturnTransportId(returnTransportId)
+            .build();
+
+        final ReservationConfirmation reservationData = commandService.reserveTrip(trip);
+        return ResponseEntity.ok(reservationData);
+    }
+
+    @PostMapping(value = "/pay")
+    public ResponseEntity<Boolean> pay(@RequestBody final PaymentRequest requestBody)
+    {
+        final boolean paymentStatus = payForTrip(requestBody.getTripReservationId());
+        return ResponseEntity.ok(paymentStatus);
+    }
+
+    public Boolean payForTrip(final int tripReservationId)
+    {
+        final boolean hasPaymentSucceeded = true;
+
+        if (!hasPaymentSucceeded)
+        {
+            final var paymentFailedEvent = PaymentFailedEvent
+                .builder().withTripReservationId(tripReservationId).build();
+            return false;
+        }
+        else
+        {
+            final var paymentSucceededEvent = PaymentConfirmedEvent
+                .builder().withTripReservationId(tripReservationId).build();
+            eventGateway.publish(paymentSucceededEvent);
+            return hasPaymentSucceeded;
+
         }
     }
 

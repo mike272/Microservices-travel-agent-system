@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import com.rsww.dto.ReservationEventType;
 import com.rsww.events.AllReservationsConfirmedEvent;
+import com.rsww.events.AllReservationsCreatedEvent;
 import com.rsww.events.HotelReservationEvent;
 import com.rsww.events.HotelsInitializedEvent;
 import com.rsww.events.PaymentConfirmedEvent;
@@ -16,6 +17,7 @@ import com.rsww.events.PaymentFailedEvent;
 import com.rsww.events.RoomsInitializedEvent;
 import com.rsww.events.TransportReservationEvent;
 import com.rsww.events.TransportsInitializedEvent;
+import com.rsww.events.TripReservationFailedEvent;
 
 
 @Component
@@ -84,6 +86,7 @@ public class AxonEventHandler
         final Message message = Message
             .builder()
             .withType("SUCCESS")
+//            .withStatus(ReservationEventType.CONFIRMED)
             .withTextContent("Payment " + event.getPaymentId() + " succeeded")
             .build();
         template.convertAndSend(TOPIC_NAME, message);
@@ -96,7 +99,21 @@ public class AxonEventHandler
             .builder()
             .withTripReservationId(event.getTripReservationId())
             .withType("SUCCESS")
+            .withStatus(ReservationEventType.CONFIRMED)
             .withTextContent("Both hotel and transport reservations for trip " + event.getTripReservationId() + " have been confirmed")
+            .build();
+        template.convertAndSend(TOPIC_NAME, message);
+    }
+
+    @EventHandler
+    public void on(final AllReservationsCreatedEvent event)
+    {
+        final Message message = Message
+            .builder()
+            .withTripReservationId(event.getTripReservationId())
+            .withType("SUCCESS")
+            .withStatus(ReservationEventType.CREATED)
+            .withTextContent("Both hotel and transport reservations for trip " + event.getTripReservationId() + " have been created.You can pay now")
             .build();
         template.convertAndSend(TOPIC_NAME, message);
     }
@@ -131,7 +148,18 @@ public class AxonEventHandler
                 .withTextContent(hotelPrefix + event.getHotelId() + " is created");
         }
         final Message message = messageBuilder.build();
+        final var x = 1;
+        template.convertAndSend(TOPIC_NAME, message);
+    }
 
+    @EventHandler
+    public void on(final TripReservationFailedEvent event)
+    {
+        final Message message = Message
+            .builder()
+            .withType("ERROR")
+            .withTextContent("Trip reservation " + event.getTripReservationId() + " failed. Reason: " + event.getReason())
+            .build();
         template.convertAndSend(TOPIC_NAME, message);
     }
 
