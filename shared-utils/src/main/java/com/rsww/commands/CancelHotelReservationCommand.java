@@ -13,5 +13,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CancelHotelReservationCommand
 {
-    private int reservationId;
+    private int tripReservationId;
 }

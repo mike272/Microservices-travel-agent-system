@@ -1,5 +1,6 @@
 package com.rsww.commands;
 
+import com.rsww.dto.ReservationEventType;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,9 +10,10 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder(setterPrefix = "with")
-@NoArgsConstructor
 @AllArgsConstructor
-public class CancelTransportReservationCommand
+@NoArgsConstructor
+public class UpdateTripStatusCommand
 {
     private int tripReservationId;
+    private ReservationEventType status;
 }

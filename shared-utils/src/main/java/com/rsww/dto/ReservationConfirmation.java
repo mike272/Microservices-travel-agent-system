@@ -16,6 +16,6 @@ public class ReservationConfirmation
     private int tripId;
     private int hotelId;
     private int transportId;
-    private String status;
+    private ReservationEventType status;
     private String message;
 }
