@@ -2,6 +2,7 @@ package com.rsww.sagaorchestrator.sagas;
 
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.commandhandling.gateway.CommandGateway;
+import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.eventhandling.gateway.EventGateway;
 import org.axonframework.modelling.saga.EndSaga;
 import org.axonframework.modelling.saga.SagaEventHandler;
@@ -10,22 +11,33 @@ import org.axonframework.modelling.saga.StartSaga;
 import org.axonframework.spring.stereotype.Saga;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 
+import com.rsww.commands.CancelHotelReservationCommand;
+import com.rsww.commands.CancelReservationCommand;
+import com.rsww.commands.CancelTransportReservationCommand;
+import com.rsww.commands.ConfirmHotelReservationCommand;
+import com.rsww.commands.ConfirmTransportReservationCommand;
 import com.rsww.commands.ReserveHotelCommand;
 import com.rsww.commands.ReserveTransportCommand;
 import com.rsww.commands.ReserveTripCommand;
+import com.rsww.commands.UpdateTripStatusCommand;
 import com.rsww.dto.ReservationEventType;
 import com.rsww.events.AllReservationsConfirmedEvent;
+import com.rsww.events.AllReservationsCreatedEvent;
 import com.rsww.events.HotelReservationEvent;
 import com.rsww.events.PaymentConfirmedEvent;
 import com.rsww.events.TransportReservationEvent;
+import com.rsww.events.TripCreatedEvent;
 import com.rsww.events.TripReservationFailedEvent;
 
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-
+@Service
 @Saga
 @Slf4j
+@NoArgsConstructor
 public class ReserveTripSaga {
 
     @Autowired
@@ -33,74 +45,117 @@ public class ReserveTripSaga {
     @Autowired
     private transient EventGateway eventGateway;
 
+//    @Autowired
+//    public ReserveTripSaga(final CommandGateway commandGateway, final EventGateway eventGateway) {
+//        this.commandGateway = commandGateway;
+//        this.eventGateway = eventGateway;
+//    }
+
     private ReservationEventType hotelStatus;
     private ReservationEventType transportStatus;
 
-
     @StartSaga
-    @SagaEventHandler(associationProperty = "reservationId")
-    public void handle(final ReserveTripCommand command) {
+    @SagaEventHandler(associationProperty = "tripReservationId")
+    public void handle(final TripCreatedEvent command) {
+        final var receivedTripData = command.getTrip();
 //        this is start of saga. It is triggered by frontend and results in reserving transport and hotel
+        SagaLifecycle.associateWith("tripReservationId", receivedTripData.getId());
         final var hotelCommand = ReserveHotelCommand.builder()
-            .withTripReservationId(command.getTripReservationId())
-            .withCustomerId(command.getCustomerId())
-            .withHotelId(command.getHotelId())
-            .withRoomIds(command.getRoomIds())
-            .withCheckInDate(command.getCheckInDate())
-            .withCheckOutDate(command.getCheckOutDate())
-            .withNumOfAdults(command.getNumOfAdults())
-            .withNumOfChildren(command.getNumOfChildren())
-            .withNumOfInfants(command.getNumOfInfants())
+            .withTripReservationId(receivedTripData.getId())
+            .withCustomerId(receivedTripData.getCustomerId())
+            .withHotelId(receivedTripData.getHotelId())
+//            .withRoomIds(receivedTripData.getRoomIds())
+            .withCheckInDate(receivedTripData.getOutboundDate())
+            .withCheckOutDate(receivedTripData.getReturnDate())
+            .withNumOfAdults(receivedTripData.getNumberOfAdults())
+            .withNumOfChildren(receivedTripData.getNumberOfChildren())
+            .withNumOfInfants(receivedTripData.getNumberOfInfants())
             .build();
 
         commandGateway.send(hotelCommand);
 
         final var transportCommand = ReserveTransportCommand.builder()
-            .withTripReservationId(command.getTripReservationId())
-            .withCustomerId(command.getCustomerId())
-            .withCustomerName(command.getCustomerName())
-            .withTransportEventId(command.getTransportId())
-            .withOutboundDate(command.getOutboundDate())
-            .withReturnDate(command.getReturnDate())
-            .withNumOfAdults(command.getNumOfAdults())
-            .withNumOfChildren(command.getNumOfChildren())
-            .withNumOfInfants(command.getNumOfInfants())
+            .withTripReservationId(receivedTripData.getId())
+            .withCustomerId(receivedTripData.getCustomerId())
+            .withOutboundTransportId(receivedTripData.getOutboundTransportId())
+            .withReturnTransportId(receivedTripData.getReturnTransportId())
+            .withOutboundDate(receivedTripData.getOutboundDate())
+            .withReturnDate(receivedTripData.getReturnDate())
+            .withNumOfAdults(receivedTripData.getNumberOfAdults())
+            .withNumOfChildren(receivedTripData.getNumberOfChildren())
+            .withNumOfInfants(receivedTripData.getNumberOfInfants())
             .build();
+
         commandGateway.send(transportCommand);
     }
 
-    @SagaEventHandler(associationProperty = "tripReservationId")
+    @SagaEventHandler(keyName = "tripReservationId", associationProperty = "tripReservationId")
     public void on(final HotelReservationEvent event) {
         if (event.getStatus() == ReservationEventType.FAILED) {
             hotelStatus = ReservationEventType.FAILED;
 
-            final var transportRollbackReservationCommand = TransportReservationEvent.builder()
+            final var cancelTransportReservation = CancelTransportReservationCommand.builder()
                 .withTripReservationId(event.getTripReservationId())
-                .withStatus(ReservationEventType.FAILED)
                 .build();
-            final var tripreservationFailedEvent = TripReservationFailedEvent.builder()
+
+            final var cancelTripReservation = CancelReservationCommand.builder()
+                .withTripReservationId(event.getTripReservationId())
+                .build();
+
+            final var tripReservationFailedEvent = TripReservationFailedEvent.builder()
                 .withTripReservationId(event.getTripReservationId())
                 .withReason("Hotel reservation failed")
                 .build();
 
-            eventGateway.publish(tripreservationFailedEvent);
-            commandGateway.send(transportRollbackReservationCommand);
+            eventGateway.publish(tripReservationFailedEvent);
+            commandGateway.send(cancelTransportReservation);
+            commandGateway.send(cancelTripReservation);
         } else if(event.getStatus() == ReservationEventType.CANCELLED){
             hotelStatus = ReservationEventType.CANCELLED;
 
-            final var transportRollbackReservationCommand = TransportReservationEvent.builder()
+            final var cancelTransportReservation = CancelTransportReservationCommand.builder()
                 .withTripReservationId(event.getTripReservationId())
-                .withStatus(ReservationEventType.CANCELLED)
                 .build();
-            commandGateway.send(transportRollbackReservationCommand);
+
+            final var cancelTripReservation = CancelReservationCommand.builder()
+                .withTripReservationId(event.getTripReservationId())
+                .build();
+
+            final var tripReservationFailedEvent = TripReservationFailedEvent.builder()
+                .withTripReservationId(event.getTripReservationId())
+                .withReason("Hotel reservation cancelled")
+                .build();
+
+            eventGateway.publish(tripReservationFailedEvent);
+            commandGateway.send(cancelTripReservation);
+            commandGateway.send(cancelTransportReservation);
         }else if(event.getStatus() == ReservationEventType.CREATED){
-            hotelStatus = ReservationEventType.CONFIRMED;
+            hotelStatus = ReservationEventType.CREATED;
+            if(transportStatus == ReservationEventType.CREATED)
+            {
+                final AllReservationsCreatedEvent allReservationsCreatedEvent = AllReservationsCreatedEvent.builder()
+                    .withTripReservationId(event.getTripReservationId())
+                    .build();
+                final UpdateTripStatusCommand updateTripStatus = UpdateTripStatusCommand.builder()
+                    .withTripReservationId(event.getTripReservationId())
+                    .withStatus(ReservationEventType.CREATED)
+                    .build();
+
+                commandGateway.send(updateTripStatus);
+                eventGateway.publish(allReservationsCreatedEvent);
+            }
         }else if (event.getStatus() == ReservationEventType.CONFIRMED){
             hotelStatus = ReservationEventType.CONFIRMED;
             if(transportStatus == ReservationEventType.CONFIRMED){
                 final var allReservationsConfirmedEvent = AllReservationsConfirmedEvent.builder()
                     .withTripReservationId(event.getTripReservationId())
                     .build();
+                final var updateTripStatus = UpdateTripStatusCommand.builder()
+                    .withTripReservationId(event.getTripReservationId())
+                    .withStatus(ReservationEventType.CONFIRMED)
+                    .build();
+
+                commandGateway.send(updateTripStatus);
                 eventGateway.publish(allReservationsConfirmedEvent);
                 SagaLifecycle.end();
             }
@@ -112,33 +167,66 @@ public class ReserveTripSaga {
         if (event.getStatus() == ReservationEventType.FAILED) {
             transportStatus = ReservationEventType.FAILED;
 
-            final var hotelRollbackReservationCommand = HotelReservationEvent.builder()
+            final var cancelHotelReservation = CancelHotelReservationCommand.builder()
                 .withTripReservationId(event.getTripReservationId())
-                .withStatus(ReservationEventType.FAILED)
                 .build();
-            final var tripreservationFailedEvent = TripReservationFailedEvent.builder()
+
+            final var cancelTripReservation = CancelReservationCommand.builder()
+                .withTripReservationId(event.getTripReservationId())
+                .build();
+
+            final var tripReservationFailedEvent = TripReservationFailedEvent.builder()
                 .withTripReservationId(event.getTripReservationId())
                 .withReason("Transport reservation failed")
                 .build();
 
-            eventGateway.publish(tripreservationFailedEvent);
-            commandGateway.send(hotelRollbackReservationCommand);
+            eventGateway.publish(tripReservationFailedEvent);
+            commandGateway.send(cancelHotelReservation);
+            commandGateway.send(cancelTripReservation);
         } else if(event.getStatus() == ReservationEventType.CANCELLED){
             transportStatus = ReservationEventType.CANCELLED;
-
-            final var hotelRollbackReservationCommand = HotelReservationEvent.builder()
+            final var cancelHotelReservation = CancelHotelReservationCommand.builder()
                 .withTripReservationId(event.getTripReservationId())
-                .withStatus(ReservationEventType.CANCELLED)
                 .build();
-            commandGateway.send(hotelRollbackReservationCommand);
+            final var cancelTripReservation = CancelReservationCommand.builder()
+                .withTripReservationId(event.getTripReservationId())
+                .build();
+
+            final var tripReservationFailedEvent = TripReservationFailedEvent.builder()
+                .withTripReservationId(event.getTripReservationId())
+                .withReason("Transport reservation cancelled")
+                .build();
+
+            eventGateway.publish(tripReservationFailedEvent);
+            commandGateway.send(cancelHotelReservation);
+            commandGateway.send(cancelTripReservation);
         }else if(event.getStatus() == ReservationEventType.CREATED){
-            transportStatus = ReservationEventType.CONFIRMED;
+            transportStatus = ReservationEventType.CREATED;
+            if(hotelStatus == ReservationEventType.CREATED){
+                final var allReservationsCreatedEvent = AllReservationsCreatedEvent.builder()
+                    .withTripReservationId(event.getTripReservationId())
+                    .build();
+                final var updateTripStatus = UpdateTripStatusCommand.builder()
+                    .withTripReservationId(event.getTripReservationId())
+                    .withStatus(ReservationEventType.CREATED)
+                    .build();
+
+                commandGateway.send(updateTripStatus);
+                eventGateway.publish(allReservationsCreatedEvent);
+            }
         }else if (event.getStatus() == ReservationEventType.CONFIRMED){
             transportStatus = ReservationEventType.CONFIRMED;
             if(hotelStatus == ReservationEventType.CONFIRMED){
                 final var allReservationsConfirmedEvent = AllReservationsConfirmedEvent.builder()
                     .withTripReservationId(event.getTripReservationId())
                     .build();
+
+                final var updateTripStatus = UpdateTripStatusCommand.builder()
+                    .withTripReservationId(event.getTripReservationId())
+                    .withStatus(ReservationEventType.CONFIRMED)
+                    .build();
+
+                commandGateway.send(updateTripStatus);
                 eventGateway.publish(allReservationsConfirmedEvent);
                 SagaLifecycle.end();
             }
@@ -146,33 +234,18 @@ public class ReserveTripSaga {
         }
     }
 
-//    @EndSaga
     @SagaEventHandler(associationProperty = "tripReservationId")
     public void on(final PaymentConfirmedEvent event){
         log.info("Payment confirmed for trip reservation {}", event.getTripReservationId());
-        final var confirmHotelReservationCommand = HotelReservationEvent.builder()
+
+        final var confirmHotelReservationCommand = ConfirmHotelReservationCommand.builder()
             .withTripReservationId(event.getTripReservationId())
-            .withStatus(ReservationEventType.CONFIRMED)
             .build();
-        final var confirmTransportReservationCommand = TransportReservationEvent.builder()
+        final var confirmTransportReservationCommand = ConfirmTransportReservationCommand.builder()
             .withTripReservationId(event.getTripReservationId())
-            .withStatus(ReservationEventType.CONFIRMED)
             .build();
+
         commandGateway.send(confirmTransportReservationCommand);
         commandGateway.send(confirmHotelReservationCommand);
-
-
-        //        if(hotelStatus == ReservationEventType.CREATED && transportStatus == ReservationEventType.CREATED){
-//            final var allReservationsConfirmedEvent = AllReservationsConfirmedEvent.builder()
-//                .withTripReservationId(event.getTripReservationId())
-//                .build();
-//            eventGateway.publish(allReservationsConfirmedEvent);
-//        }else{
-//            final var tripreservationFailedEvent = TripReservationFailedEvent.builder()
-//                .withTripReservationId(event.getTripReservationId())
-//                .withReason("Payment failed. One of the reservations was no longer reserved.")
-//                .build();
-//            eventGateway.publish(tripreservationFailedEvent);
-//        }
     }
 }
