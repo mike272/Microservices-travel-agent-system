@@ -1,7 +1,6 @@
 package com.rsww.travel_agent.trip;
 
 import java.util.ArrayList;
-import java.util.Optional;
 
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.eventhandling.gateway.EventGateway;
@@ -11,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.rsww.dto.ReservationEventType;
+import com.rsww.events.TripCreatedEvent;
 import com.rsww.events.TripReservationFailedEvent;
 import com.rsww.responses.UsersTripsResponse;
 
@@ -33,7 +33,7 @@ public class TripService
         this.commandGateway = commandGateway;
     }
 
-    public com.rsww.dto.Trip mapTotripDTO(final Trip trip){
+    public com.rsww.dto.Trip mapToTripDTO(final Trip trip){
         return com.rsww.dto.Trip.builder()
             .withId(trip.getId())
             .withStatus(trip.getStatus())
@@ -79,17 +79,19 @@ public class TripService
             tripRepository
                 .getTripsforUser(customerId)
                 .stream()
-                .map(this::mapTotripDTO)
+                .map(this::mapToTripDTO)
                 .toList()
         ));
     }
 
-    public void createInitialReservation(final com.rsww.dto.Trip trip)
+    public Trip createInitialReservation(final com.rsww.dto.Trip trip)
     {
         logger.info("Creating initial trip reservation for customer: {}",trip.getCustomerId());
         final Trip domainTrip = mapToDomainTrip(trip);
         trip.setStatus(ReservationEventType.CREATED);
-        tripRepository.save(domainTrip);
+        final var savedTrip = tripRepository.save(domainTrip);
+        eventGateway.publish(TripCreatedEvent.builder().withTrip(mapToTripDTO(savedTrip)).build());
+        return savedTrip;
     }
 
     public void confirmTripReservation(final int tripId){
@@ -106,5 +108,18 @@ public class TripService
         tripRepository.save(trip);
     }
 
+    public void updateTripStatus(final int tripReservationId, final ReservationEventType status)
+    {
+        logger.info("Updating trip status for trip: {}", tripReservationId);
+        final Trip trip = tripRepository.findById(tripReservationId).orElseThrow(()->{
+            logger.error("Trip not found for id: {}", tripReservationId);
+            eventGateway.publish(TripReservationFailedEvent.builder()
+                .withTripReservationId(tripReservationId)
+                .withReason("Trip with id "+ tripReservationId + "was not found in repository").build());
+            return new RuntimeException("Trip not found for id: "+ tripReservationId);
+        });
 
+        trip.setStatus(status);
+        tripRepository.save(trip);
+    }
 }
