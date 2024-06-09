@@ -24,7 +24,7 @@ public class Room
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     private int numberOfPeople;
     private double basePrice;

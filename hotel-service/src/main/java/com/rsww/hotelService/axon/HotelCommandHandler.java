@@ -6,6 +6,8 @@ import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventhandling.gateway.EventGateway;
 import org.springframework.stereotype.Component;
 
+import com.rsww.commands.CancelHotelReservationCommand;
+import com.rsww.commands.ConfirmHotelReservationCommand;
 import com.rsww.commands.InitializeHotelsCommand;
 import com.rsww.commands.ReserveHotelCommand;
 import com.rsww.dto.ReservationEventType;
@@ -39,9 +41,9 @@ public class HotelCommandHandler
     public void handle(final ReserveHotelCommand command)
     {
         final var hasReservationSucceeded = reservationService.reserveRooms(
+            command.getTripReservationId(),
             command.getCustomerId(),
             command.getHotelId(),
-            command.getRoomIds(),
             command.getCheckInDate(),
             command.getCheckOutDate(),
             command.getNumOfAdults(),
@@ -52,6 +54,7 @@ public class HotelCommandHandler
         {
             eventGateway.publish(HotelReservationEvent
                 .builder()
+                .withTripReservationId(command.getTripReservationId())
                 .withHotelId(command.getHotelId())
                 .withCustomerId(command.getCustomerId())
                 .withCheckInDate(command.getCheckInDate())
@@ -60,6 +63,29 @@ public class HotelCommandHandler
                 .build()
             );
         }
+
+        final var reservationSucceededEvent = HotelReservationEvent
+            .builder()
+            .withTripReservationId(command.getTripReservationId())
+            .withHotelId(command.getHotelId())
+            .withCustomerId(command.getCustomerId())
+            .withCheckInDate(command.getCheckInDate())
+            .withCheckOutDate(command.getCheckOutDate())
+            .withStatus(ReservationEventType.CREATED)
+            .build();
+        eventGateway.publish(reservationSucceededEvent);
+    }
+
+    @CommandHandler
+    public void on(final ConfirmHotelReservationCommand command)
+    {
+        reservationService.confirmReservation(command.getTripReservationId());
+    }
+
+    @CommandHandler
+    public void on(final CancelHotelReservationCommand command)
+    {
+        reservationService.cancelReservation(command.getTripReservationId());
     }
 
 }

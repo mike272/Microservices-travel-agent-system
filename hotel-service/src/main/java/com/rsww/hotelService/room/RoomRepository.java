@@ -20,6 +20,9 @@ public interface RoomRepository extends CrudRepository<Room, Integer>
     @Query(
         "SELECT t FROM Room t WHERE t.hotel.id = :hotelId")
     List<Room> findRoomsByHotelId(int hotelId);
+
+    @Query("SELECT r FROM Room r WHERE r.hotel.id = :hotelId AND r.numberOfPeople >= :totalGuests")
+    List<Room> findRoomsByHotelIdAndGuests(@Param("hotelId") int hotelId, @Param("totalGuests") int totalGuests);
 //    @Query(
 //        "SELECT t FROM Room t WHERE "
 //           )

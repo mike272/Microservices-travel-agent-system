@@ -40,6 +40,7 @@ public class Reservation
     private Date fromDate;
     private Date toDate;
     private ReservationEventType reservationStatus;
+    private int tripReservationId;
 
 //
 //    public void addEvent(final HotelReservationEvent event) {

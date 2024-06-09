@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
+
 @Repository
 public class ReservationRepositoryImpl implements ReservationRepository
 {
@@ -25,8 +26,11 @@ public class ReservationRepositoryImpl implements ReservationRepository
     }
 
     @Override
-    public List<Reservation> findReservationsByRoomIdAndDateRange(final int roomId, final Date fromDate, final Date toDate) {
-        return entityManager.createQuery("SELECT r FROM Reservation r WHERE r.room.id = :roomId AND ((r.fromDate BETWEEN :fromDate AND :toDate) OR (r.toDate BETWEEN :fromDate AND :toDate))", Reservation.class)
+    public List<Reservation> findReservationsByRoomIdAndDateRange(final int roomId, final Date fromDate, final Date toDate)
+    {
+        return entityManager.createQuery(
+                "SELECT r FROM Reservation r WHERE r.room.id = :roomId AND ((r.fromDate BETWEEN :fromDate AND :toDate) OR (r.toDate BETWEEN :fromDate AND :toDate))",
+                Reservation.class)
             .setParameter("roomId", roomId)
             .setParameter("fromDate", fromDate)
             .setParameter("toDate", toDate)
@@ -34,9 +38,18 @@ public class ReservationRepositoryImpl implements ReservationRepository
     }
 
     @Override
+    public List<Reservation> findByTripReservationId(final int tripReservationId)
+    {
+        return entityManager.createQuery("SELECT r FROM Reservation r WHERE r.tripReservationId = :tripReservationId", Reservation.class)
+            .setParameter("tripReservationId", tripReservationId)
+            .getResultList();
+    }
+
+    @Override
     public <S extends Reservation> S save(final S entity)
     {
-        return null;
+        entityManager.persist(entity);
+        return entity;
     }
 
     @Override
