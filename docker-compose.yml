@@ -6,7 +6,7 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: postgres
     ports:
-      - 5432:5432
+      - 2345:2345
 
 
   axonserver:
@@ -25,7 +25,7 @@ services:
       - postgres
       - axonserver
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/postgres
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:2345/postgres
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=password
       - AXON_AXONSERVER_SERVERS=axon
@@ -38,7 +38,7 @@ services:
       - postgres
       - axonserver
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/postgres
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:2345/postgres
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=password
       - AXON_AXONSERVER_SERVERS=axon
@@ -51,7 +51,7 @@ services:
       - postgres
       - axonserver
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/postgres
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:2345/postgres
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=password
       - AXON_AXONSERVER_SERVERS=axon
@@ -64,7 +64,7 @@ services:
       - postgres
       - axonserver
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/postgres
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:2345/postgres
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=password
       - AXON_AXONSERVER_SERVERS=axon
@@ -77,7 +77,7 @@ services:
       - postgres
       - axonserver
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/postgres
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:2345/postgres
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=password
       - AXON_AXONSERVER_SERVERS=axon

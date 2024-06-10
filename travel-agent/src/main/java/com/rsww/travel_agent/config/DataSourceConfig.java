@@ -15,7 +15,7 @@ public class DataSourceConfig {
 
     final Logger logger = LoggerFactory.getLogger(DataSourceConfig.class);
     @Value("${spring.datasource.url}")
-    private String url = "jdbc:postgresql://postgres:5432/postgres";
+    private String url = "jdbc:postgresql://postgres:2345/postgres";
 
     @Value("${spring.datasource.username}")
     private String username = "postgres";

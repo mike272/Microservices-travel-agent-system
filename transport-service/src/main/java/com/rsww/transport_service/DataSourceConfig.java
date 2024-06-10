@@ -11,18 +11,20 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 
 @Configuration
-public class DataSourceConfig {
+public class DataSourceConfig
+{
 
     final Logger logger = LoggerFactory.getLogger(DataSourceConfig.class);
 
-    private String url = "jdbc:postgresql://postgres:5432/postgres";
+    private String url = "jdbc:postgresql://postgres:2345/postgres";
 
     private String username = "postgres";
 
     private String password = "password";
 
     @Bean
-    public DataSource dataSource() {
+    public DataSource dataSource()
+    {
         logger.info("Creating datasource with url: {}", url);
         final DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setUrl(url);
