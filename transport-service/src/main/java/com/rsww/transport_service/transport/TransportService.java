@@ -71,6 +71,7 @@ public class TransportService
     public com.rsww.dto.Transport mapToDtoTransport(final Transport transport)
     {
         return com.rsww.dto.Transport.builder()
+            .withId(transport.getId())
             .withTransportType(transport.getTransportType())
             .withDepartureDate(transport.getDepartureDate())
             .withTotalNumberOfSeats(transport.getTotalPlaces())
@@ -193,6 +194,8 @@ public class TransportService
             .withTripReservationId(tripReservationId)
             .withTransportEventId(outboundTransportId)
             .withStatus(ReservationEventType.CREATED)
+            .withLocation(outboundTransport.getDestinationCity() + "/" + outboundTransport.getDestinationCountry())
+            .withDates(outboundTransport.getDepartureDate().toString())
             .build();
 
         eventGateway.publish(transportReservationEvent);

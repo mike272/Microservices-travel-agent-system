@@ -1,6 +1,7 @@
 package com.rsww.hotelService.axon;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.eventhandling.gateway.EventGateway;
@@ -50,7 +51,7 @@ public class HotelCommandHandler
             command.getNumOfChildren(),
             command.getNumOfInfants()
         );
-        if (!hasReservationSucceeded)
+        if (Objects.equals(hasReservationSucceeded, "false"))
         {
             eventGateway.publish(HotelReservationEvent
                 .builder()
@@ -71,6 +72,8 @@ public class HotelCommandHandler
             .withCustomerId(command.getCustomerId())
             .withCheckInDate(command.getCheckInDate())
             .withCheckOutDate(command.getCheckOutDate())
+            .withLocation(hasReservationSucceeded)
+            .withDates(command.getCheckInDate().toString() + " - " + command.getCheckOutDate().toString())
             .withStatus(ReservationEventType.CREATED)
             .build();
         eventGateway.publish(reservationSucceededEvent);

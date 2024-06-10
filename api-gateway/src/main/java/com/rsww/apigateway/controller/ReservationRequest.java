@@ -15,4 +15,5 @@ public class ReservationRequest
     private int adults;
     private int children;
     private int infants;
+    private String location;
 }

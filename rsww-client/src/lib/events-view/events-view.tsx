@@ -15,6 +15,10 @@ const EventsView = () => {
   const bookingId = useSelector(
     (state: RootState) => state.booking.reservationId
   );
+  let localBookingId = bookingId;
+  useEffect(() => {
+    localBookingId = bookingId;
+  }, [bookingId]);
   const dispatch = useDispatch();
 
   const subscriptionRef = useRef(null);
@@ -48,12 +52,35 @@ const EventsView = () => {
         (message) => {
           if (message.body) {
             const eventData = JSON.parse(message.body) as EventType;
-            if (eventData?.tripReservationId === bookingId) {
-              notification.open({
-                message: "Your reservation has been confirmed",
-                type: "success",
-              });
-              dispatch(setReservationStatus(eventData.status));
+            console.log({
+              reservationId: eventData?.tripReservationId,
+              bookingId,
+              localBookingId,
+            });
+            if (
+              eventData?.tripReservationId === localBookingId ||
+              eventData?.tripReservationId === localBookingId - 1 ||
+              true
+            ) {
+              if (eventData.status === "PAID") {
+                notification.open({
+                  message: "Your reservation has been confirmed",
+                  type: "success",
+                });
+              } else if (eventData.status === "CONFIRMED") {
+                notification.open({
+                  message: "Your reservation has been confirmed",
+                  type: "success",
+                });
+                dispatch(setReservationStatus("CONFIRMED"));
+              } else if (eventData.status === "CREATED") {
+                notification.open({
+                  message: "Your reservation has been created",
+                  type: "info",
+                });
+
+                dispatch(setReservationStatus("CREATED"));
+              }
             }
             console.log({ eventData });
             setEvents((prevEvents) => [...prevEvents, eventData]);
@@ -69,32 +96,6 @@ const EventsView = () => {
           }
         }
       );
-      // subscriptionRef.current = stompClient.subscribe(
-      //   "/topic/messages",
-      //   (message) => {
-      //     if (message.body) {
-      //       const eventData = JSON.parse(message.body) as EventType;
-      //       if (eventData?.tripReservationId === bookingId) {
-      //         notification.open({
-      //           message: "Your reservation has been confirmed",
-      //           type: "success",
-      //         });
-      //         dispatch(setReservationStatus(eventData.status));
-      //       }
-      //       console.log({ eventData });
-      //       setEvents((prevEvents) => [...prevEvents, eventData]);
-
-      //       notification.open({
-      //         message: eventData.textContent,
-      //         type: eventData.type.toLowerCase() as
-      //           | "info"
-      //           | "success"
-      //           | "error"
-      //           | "warning",
-      //       });
-      //     }
-      //   }
-      // );
     };
 
     stompClient.onStompError = (error) => {

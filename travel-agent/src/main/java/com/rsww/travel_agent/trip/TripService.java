@@ -90,7 +90,10 @@ public class TripService
         final Trip domainTrip = mapToDomainTrip(trip);
         trip.setStatus(ReservationEventType.CREATED);
         final var savedTrip = tripRepository.save(domainTrip);
-        eventGateway.publish(TripCreatedEvent.builder().withTrip(mapToTripDTO(savedTrip)).build());
+        eventGateway.publish(TripCreatedEvent.builder()
+            .withLocation(trip.getLocation())
+            .withDates(trip.getOutboundDate().toString() + " - " + trip.getReturnDate().toString())
+            .withTrip(mapToTripDTO(savedTrip)).build());
         return savedTrip;
     }
 

@@ -11,11 +11,9 @@ import org.springframework.stereotype.Service;
 
 import com.rsww.commands.InitializeHotelsCommand;
 import com.rsww.commands.InitializeTransportsCommand;
-import com.rsww.commands.ReserveHotelCommand;
 import com.rsww.commands.ReserveTripCommand;
 import com.rsww.dto.ReservationConfirmation;
 import com.rsww.dto.Trip;
-import com.rsww.events.PaymentConfirmedEvent;
 
 
 @Service

@@ -1,11 +1,4 @@
-version: '1'
 services:
-  # rabbitmq:
-  #   image: rabbitmq:3-management
-  #   ports:
-  #     - 5672:5672
-  #     - 15672:15672
-
   postgres:
     image: postgres:16
     environment:
@@ -18,42 +11,83 @@ services:
 
   axonserver:
     image: axoniq/axonserver
+    hostname: axon
+    container_name: axon
     ports:
       - 8024:8024
       - 8124:8124
 
-  # travel-agent:
-  #   build:
-  #     context: ./TA
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - 8081:8081
-  #   depends_on:
-  #     - rabbitmq
-  #     - postgres
-  #     - axonserver
+  travel-agent:
+    image: mike272/travel-agent
+    ports:
+      - 8081:8081
+    depends_on:
+      - postgres
+      - axonserver
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/postgres
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+      - AXON_AXONSERVER_SERVERS=axon
 
-  # hotel-service:
-  #   build:
-  #     context: ./hotel-service
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - 8082:8082
-  #   depends_on:
-  #     - rabbitmq
-  #     - postgres
-  #     - axonserver
-  # # not yet implemented
-  # # transport-service:
-  # #   build:
-  # #     context: ./transport-service
-  # #     dockerfile: Dockerfile
-  # #   ports:
-  # #     - 8083:8083
-  # #   depends_on:
-  # #     - rabbitmq
-  # #     - postgres
-  # #     - axonserver
+  hotel-service:
+    image: mike272/hotel-service
+    ports:
+      - 8082:8082
+    depends_on:
+      - postgres
+      - axonserver
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/postgres
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+      - AXON_AXONSERVER_SERVERS=axon
+
+  transport-service:
+    image: mike272/transport-service
+    ports:
+      - 8083:8083
+    depends_on:
+      - postgres
+      - axonserver
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/postgres
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+      - AXON_AXONSERVER_SERVERS=axon
+
+  api-gateway:
+    image: mike272/api-gateway
+    ports:
+      - 9999:9999
+    depends_on:
+      - postgres
+      - axonserver
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/postgres
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+      - AXON_AXONSERVER_SERVERS=axon
+
+  saga-orchestrator:
+    image: mike272/saga-orchestrator
+    ports:
+      - 8085:8085
+    depends_on:
+      - postgres
+      - axonserver
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/postgres
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+      - AXON_AXONSERVER_SERVERS=axon
+
+  rsww-client:
+    image: mike272/rsww-client
+    ports:
+      - 3000:3000
+
+
   # payment-service:
   #   build:
   #     context: ./payment-service
@@ -64,29 +98,3 @@ services:
   #     - rabbitmq
   #     - postgres
   #     - axonserver
-  # api-gateway:
-  #   build:
-  #     context: ./api-gateway
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - 8080:8080
-  #   depends_on:
-  #     # - rabbitmq
-  #     - postgres
-  #     - axonserver
-  # saga-orchestrator:
-  #   build:
-  #     context: ./saga-orchestrator
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - 8085:8085
-  #   depends_on:
-  #     - rabbitmq
-  #     - postgres
-  #     - axonserver
-  #rsww-client:
-   # build:
-   #  context: ./rsww-client
-   # dockerfile: Dockerfile
-   #ports:
-   #   - 3000:3000

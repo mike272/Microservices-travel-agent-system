@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
+import com.rsww.dto.ReservationConfirmation;
 import com.rsww.dto.ReservationEventType;
 import com.rsww.events.AllReservationsConfirmedEvent;
 import com.rsww.events.AllReservationsCreatedEvent;
@@ -100,7 +101,8 @@ public class AxonEventHandler
             .withTripReservationId(event.getTripReservationId())
             .withType("SUCCESS")
             .withStatus(ReservationEventType.CONFIRMED)
-            .withTextContent("Both hotel and transport reservations for trip " + event.getTripReservationId() + " have been confirmed")
+            .withTextContent("Both hotel and transport reservations for trip " + event.getTripReservationId() + " to " + event.getLocation() + " on "
+                + event.getDates() + " have been confirmed")
             .build();
         template.convertAndSend(TOPIC_NAME, message);
     }
@@ -113,7 +115,8 @@ public class AxonEventHandler
             .withTripReservationId(event.getTripReservationId())
             .withType("SUCCESS")
             .withStatus(ReservationEventType.CREATED)
-            .withTextContent("Both hotel and transport reservations for trip " + event.getTripReservationId() + " have been created.You can pay now")
+            .withTextContent("Both hotel and transport reservations for trip " + event.getTripReservationId() + " to " + event.getLocation() + " on "
+                + event.getDates() + " have been created.You can pay now")
             .build();
         template.convertAndSend(TOPIC_NAME, message);
     }
@@ -127,7 +130,8 @@ public class AxonEventHandler
         {
             messageBuilder
                 .withType("SUCCESS")
-                .withTextContent(hotelPrefix + event.getHotelId() + " has been confirmed");
+                .withTextContent(hotelPrefix + event.getHotelId() + " in " + event.getLocation() + " on "
+                    + event.getDates() + " has been confirmed");
         }
         else if (event.getStatus().equals(ReservationEventType.CANCELLED))
         {
@@ -145,7 +149,8 @@ public class AxonEventHandler
         {
             messageBuilder
                 .withType("SUCCESS")
-                .withTextContent(hotelPrefix + event.getHotelId() + " is created");
+                .withTextContent(hotelPrefix + event.getHotelId() + " in " + event.getLocation() + " on "
+                    + event.getDates() + " is created");
         }
         final Message message = messageBuilder.build();
         final var x = 1;
@@ -164,6 +169,17 @@ public class AxonEventHandler
     }
 
     @EventHandler
+    public void on(final ReservationConfirmation event)
+    {
+        final Message message = Message
+            .builder()
+            .withType("SUCCESS")
+            .withTextContent("Trip " + event.getTripId() + event.getMessage() + " has been created")
+            .build();
+        template.convertAndSend(TOPIC_NAME, message);
+    }
+
+    @EventHandler
     public void on(final TransportReservationEvent event)
     {
         final var messageBuilder = Message.builder();
@@ -172,7 +188,8 @@ public class AxonEventHandler
         {
             messageBuilder
                 .withType("SUCCESS")
-                .withTextContent(transportPrefix + event.getTripReservationId() + " has been confirmed");
+                .withTextContent(transportPrefix + event.getTripReservationId() + " to " + event.getLocation() + " on "
+                    + event.getDates() + " has been confirmed");
         }
         else if (event.getStatus().equals(ReservationEventType.CANCELLED))
         {
@@ -190,7 +207,8 @@ public class AxonEventHandler
         {
             messageBuilder
                 .withType("SUCCESS")
-                .withTextContent(transportPrefix + event.getTripReservationId() + " is created");
+                .withTextContent(transportPrefix + event.getTripReservationId() + " to " + event.getLocation() + " on "
+                    + event.getDates() + " is created");
         }
         final Message message = messageBuilder.build();
 

@@ -29,7 +29,11 @@ public class TripCommandHandler
         {
             return ReservationConfirmation.builder().withStatus(ReservationEventType.FAILED).build();
         }
-        return ReservationConfirmation.builder().withStatus(ReservationEventType.CREATED).withReservationId(trip.getId()).build();
+        return ReservationConfirmation.builder().withMessage(
+            " to " + trip.getLocation() + " on " +
+                trip.getOutboundDate().toString()+"-"+trip.getReturnDate().toString() +
+                " for " + trip.getNumberOfAdults()+trip.getNumberOfChildren()+trip.getNumberOfInfants() + " people "
+        ).withStatus(ReservationEventType.CREATED).withReservationId(trip.getId()).build();
     }
 
     @CommandHandler

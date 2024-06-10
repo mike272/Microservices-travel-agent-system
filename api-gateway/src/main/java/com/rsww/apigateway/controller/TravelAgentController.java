@@ -166,6 +166,7 @@ public class TravelAgentController
         final int customerId = body.getCustomerId();
         final String fromDate = body.getFromDate();
         final String toDate = body.getToDate();
+        final String location = body.getLocation();
 
         final int adults = body.getAdults();
         final int children = body.getChildren();
@@ -186,6 +187,7 @@ public class TravelAgentController
 
         final Trip trip = Trip.builder()
             .withHotelId(hotelId)
+            .withLocation(location)
             .withCustomerId(customerId)
             .withNumberOfAdults(adults)
             .withNumberOfChildren(children)

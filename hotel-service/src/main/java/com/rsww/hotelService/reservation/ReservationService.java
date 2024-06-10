@@ -37,14 +37,14 @@ public class ReservationService
         reservationRepository.save(reservation);
     }
 
-    public boolean reserveRooms(final int tripReservationId,
-                                final int clientId,
-                                final int hotelId,
-                                final Date checkInDate,
-                                final Date checkOutDate,
-                                final int numberOfAdults,
-                                final int numberOfChildren,
-                                final int numberOfInfants)
+    public String reserveRooms(final int tripReservationId,
+                               final int clientId,
+                               final int hotelId,
+                               final Date checkInDate,
+                               final Date checkOutDate,
+                               final int numberOfAdults,
+                               final int numberOfChildren,
+                               final int numberOfInfants)
     {
         try
         {
@@ -56,14 +56,14 @@ public class ReservationService
                     .withStatus(ReservationEventType.FAILED)
                     .withTripReservationId(tripReservationId)
                     .build());
-                return false;
+                return "false";
             }
             final var foundRoom = foundRooms.getFirst();
             final List<Reservation> existingReservations =
                 reservationRepository.findReservationsByRoomIdAndDateRange(foundRoom.getId(), checkInDate, checkOutDate);
             if (!existingReservations.isEmpty())
             {
-                return false;
+                return "false";
             }
 
             final Hotel hotel = hotelRepository.findById(hotelId)
@@ -83,11 +83,11 @@ public class ReservationService
                 .withReservationStatus(ReservationEventType.CREATED)
                 .build();
             saveReservation(reservation);
-            return true;
+            return hotel.getCity() + "/" + hotel.getCountry();
         }
         catch (final Exception e)
         {
-            return false;
+            return "false";
         }
     }
 
@@ -104,6 +104,8 @@ public class ReservationService
         final var hotelConfirmedEvent = HotelReservationEvent.builder()
             .withTripReservationId(tripReservationId)
             .withStatus(ReservationEventType.CONFIRMED)
+            .withLocation(reservation.getHotel().getCity() + "/" + reservation.getHotel().getCountry())
+            .withDates(reservation.getFromDate().toString() + " - " + reservation.getToDate().toString())
             .build();
         eventGateway.publish(hotelConfirmedEvent);
     }

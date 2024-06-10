@@ -30,7 +30,7 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	implementation 'com.github.mike272:RSWW-shared-lib:v0.0.2'
+	implementation 'com.github.mike272:RSWW-shared-lib:v0.0.4'
 	implementation 'org.axonframework:axon-spring-boot-starter:+'
 	implementation 'org.axonframework:axon-test:+'
 }

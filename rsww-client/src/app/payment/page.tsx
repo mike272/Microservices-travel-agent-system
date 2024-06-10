@@ -53,7 +53,7 @@ export default function Payment() {
     ) ?? 5;
 
   useEffect(() => {
-    if (reservationStatus === "PAID") {
+    if (reservationStatus === "CONFIRMED") {
       setIsLoading(false);
       router.push("/confirmation"); // Navigate to confirmation screen
     }
@@ -67,6 +67,9 @@ export default function Payment() {
 
     return `${day}/${month}/${year}`;
   };
+  console.log({
+    reservationStatus,
+  });
 
   return (
     <div>
@@ -124,7 +127,6 @@ export default function Payment() {
               numberOfInfants
             );
             dispatch(setReservationId(response.reservationId));
-            dispatch(setReservationStatus("WAITING_FOR_PAYMENT"));
           } catch (e) {
             console.log(e);
           } finally {
@@ -134,7 +136,7 @@ export default function Payment() {
       >
         Reserve
       </Button>
-      {true && (
+      {reservationStatus === "CREATED" && (
         <Button
           type="primary"
           loading={isLoading}

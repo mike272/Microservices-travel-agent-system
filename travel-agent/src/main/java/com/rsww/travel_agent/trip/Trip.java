@@ -42,4 +42,5 @@ public class Trip {
     private int returnTransportReservationId;
     private Date outboundDate;
     private Date returnDate;
+    private String location;
 }

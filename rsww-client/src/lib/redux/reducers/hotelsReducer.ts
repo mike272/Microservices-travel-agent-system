@@ -9,16 +9,17 @@ interface HotelsState {
 
 const initialState: HotelsState = {
   hotels: [],
-  selectedHotel: {
-    id: 812,
-    name: "default hotel",
-    starsNum: 5,
-    arechildrenAllowed: true,
-    city: "Zakynthos",
-    country: "Grecja",
-    description: "test description",
-    minPrice: 200,
-  } as Hotel,
+  selectedHotel: null,
+  // {
+  //   id: 812,
+  //   name: "default hotel",
+  //   starsNum: 5,
+  //   arechildrenAllowed: true,
+  //   city: "Zakynthos",
+  //   country: "Grecja",
+  //   description: "test description",
+  //   minPrice: 200,
+  // } as Hotel,
   selectedRooms: [],
 };
 

@@ -135,6 +135,8 @@ public class ReserveTripSaga {
             {
                 final AllReservationsCreatedEvent allReservationsCreatedEvent = AllReservationsCreatedEvent.builder()
                     .withTripReservationId(event.getTripReservationId())
+                    .withLocation(event.getLocation())
+                    .withDates(event.getDates())
                     .build();
                 final UpdateTripStatusCommand updateTripStatus = UpdateTripStatusCommand.builder()
                     .withTripReservationId(event.getTripReservationId())
@@ -149,6 +151,8 @@ public class ReserveTripSaga {
             if(transportStatus == ReservationEventType.CONFIRMED){
                 final var allReservationsConfirmedEvent = AllReservationsConfirmedEvent.builder()
                     .withTripReservationId(event.getTripReservationId())
+                    .withLocation(event.getLocation())
+                    .withDates(event.getDates())
                     .build();
                 final var updateTripStatus = UpdateTripStatusCommand.builder()
                     .withTripReservationId(event.getTripReservationId())
@@ -205,6 +209,8 @@ public class ReserveTripSaga {
             if(hotelStatus == ReservationEventType.CREATED){
                 final var allReservationsCreatedEvent = AllReservationsCreatedEvent.builder()
                     .withTripReservationId(event.getTripReservationId())
+                    .withLocation(event.getLocation())
+                    .withDates(event.getDates())
                     .build();
                 final var updateTripStatus = UpdateTripStatusCommand.builder()
                     .withTripReservationId(event.getTripReservationId())
@@ -219,6 +225,8 @@ public class ReserveTripSaga {
             if(hotelStatus == ReservationEventType.CONFIRMED){
                 final var allReservationsConfirmedEvent = AllReservationsConfirmedEvent.builder()
                     .withTripReservationId(event.getTripReservationId())
+                    .withLocation(event.getLocation())
+                    .withDates(event.getDates())
                     .build();
 
                 final var updateTripStatus = UpdateTripStatusCommand.builder()
