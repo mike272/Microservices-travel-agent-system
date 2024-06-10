@@ -36,7 +36,7 @@ export default function Hotels() {
   }
 
   useEffect(() => {
-    if (hotels.length === 0) {
+    if (!hotels || hotels?.length === 0) {
       fetchHotels();
     }
   }, []);
@@ -99,7 +99,6 @@ export default function Hotels() {
   }
 
   function onSelectHotel(hotel: Hotel) {
-    console.log("Selected hotel", hotel);
     dispatch(setSelectedHotel(hotel));
     router.push("/payment");
   }

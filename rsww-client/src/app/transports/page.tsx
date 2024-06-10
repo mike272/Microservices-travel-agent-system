@@ -37,7 +37,6 @@ export default function Transports() {
   const transports = useSelector(
     (state: RootState) => state.transports.transports
   );
-  console.log({ transports });
   // const sortedTransports = transports.sort(
   //   (a, b) => a.departureDate?.getTime() - b.departureDate?.getTime()
   // );

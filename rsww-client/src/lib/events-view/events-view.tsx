@@ -52,11 +52,7 @@ const EventsView = () => {
         (message) => {
           if (message.body) {
             const eventData = JSON.parse(message.body) as EventType;
-            console.log({
-              reservationId: eventData?.tripReservationId,
-              bookingId,
-              localBookingId,
-            });
+
             if (
               eventData?.tripReservationId === localBookingId ||
               eventData?.tripReservationId === localBookingId - 1 ||

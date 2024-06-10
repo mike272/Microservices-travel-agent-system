@@ -205,18 +205,29 @@ public class TravelAgentController
     @PostMapping(value = "/pay")
     public ResponseEntity<Boolean> pay(@RequestBody final PaymentRequest requestBody)
     {
+        try
+        {
+            // Make the method wait for 2 seconds
+            Thread.sleep(2000);
+        }
+        catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
+
         final boolean paymentStatus = payForTrip(requestBody.getTripReservationId());
         return ResponseEntity.ok(paymentStatus);
     }
 
     public Boolean payForTrip(final int tripReservationId)
     {
-        final boolean hasPaymentSucceeded = true;
+        final boolean hasPaymentSucceeded = Math.random() <= 0.75;
 
         if (!hasPaymentSucceeded)
         {
             final var paymentFailedEvent = PaymentFailedEvent
                 .builder().withTripReservationId(tripReservationId).build();
+            eventGateway.publish(paymentFailedEvent);
             return false;
         }
         else

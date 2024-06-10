@@ -1,7 +1,5 @@
 const initialize = async () => {
-  console.log({
-    url: process.env.NEXT_PUBLIC_API_GATEWAY_ADDRESS,
-  });
+
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API_GATEWAY_ADDRESS}/v1/hotels/initialize`,
     {

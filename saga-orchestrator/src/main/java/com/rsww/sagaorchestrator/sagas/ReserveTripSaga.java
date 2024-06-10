@@ -27,6 +27,7 @@ import com.rsww.events.AllReservationsConfirmedEvent;
 import com.rsww.events.AllReservationsCreatedEvent;
 import com.rsww.events.HotelReservationEvent;
 import com.rsww.events.PaymentConfirmedEvent;
+import com.rsww.events.PaymentFailedEvent;
 import com.rsww.events.TransportReservationEvent;
 import com.rsww.events.TripCreatedEvent;
 import com.rsww.events.TripReservationFailedEvent;
@@ -94,9 +95,12 @@ public class ReserveTripSaga {
         if (event.getStatus() == ReservationEventType.FAILED) {
             hotelStatus = ReservationEventType.FAILED;
 
-            final var cancelTransportReservation = CancelTransportReservationCommand.builder()
-                .withTripReservationId(event.getTripReservationId())
-                .build();
+            if(!transportStatus.equals(ReservationEventType.FAILED)){
+                final var cancelTransportReservation = CancelTransportReservationCommand.builder()
+                    .withTripReservationId(event.getTripReservationId())
+                    .build();
+                commandGateway.send(cancelTransportReservation);
+            }
 
             final var cancelTripReservation = CancelReservationCommand.builder()
                 .withTripReservationId(event.getTripReservationId())
@@ -108,14 +112,16 @@ public class ReserveTripSaga {
                 .build();
 
             eventGateway.publish(tripReservationFailedEvent);
-            commandGateway.send(cancelTransportReservation);
             commandGateway.send(cancelTripReservation);
         } else if(event.getStatus() == ReservationEventType.CANCELLED){
             hotelStatus = ReservationEventType.CANCELLED;
 
-            final var cancelTransportReservation = CancelTransportReservationCommand.builder()
-                .withTripReservationId(event.getTripReservationId())
-                .build();
+            if(!transportStatus.equals(ReservationEventType.CANCELLED)){
+                final var cancelTransportReservation = CancelTransportReservationCommand.builder()
+                    .withTripReservationId(event.getTripReservationId())
+                    .build();
+                commandGateway.send(cancelTransportReservation);
+            }
 
             final var cancelTripReservation = CancelReservationCommand.builder()
                 .withTripReservationId(event.getTripReservationId())
@@ -128,7 +134,6 @@ public class ReserveTripSaga {
 
             eventGateway.publish(tripReservationFailedEvent);
             commandGateway.send(cancelTripReservation);
-            commandGateway.send(cancelTransportReservation);
         }else if(event.getStatus() == ReservationEventType.CREATED){
             hotelStatus = ReservationEventType.CREATED;
             if(transportStatus == ReservationEventType.CREATED)
@@ -170,10 +175,13 @@ public class ReserveTripSaga {
     public void on(final TransportReservationEvent event) {
         if (event.getStatus() == ReservationEventType.FAILED) {
             transportStatus = ReservationEventType.FAILED;
+            if(!hotelStatus.equals(ReservationEventType.FAILED)){
+                final var cancelHotelReservation = CancelHotelReservationCommand.builder()
+                    .withTripReservationId(event.getTripReservationId())
+                    .build();
+                commandGateway.send(cancelHotelReservation);
+            }
 
-            final var cancelHotelReservation = CancelHotelReservationCommand.builder()
-                .withTripReservationId(event.getTripReservationId())
-                .build();
 
             final var cancelTripReservation = CancelReservationCommand.builder()
                 .withTripReservationId(event.getTripReservationId())
@@ -185,13 +193,16 @@ public class ReserveTripSaga {
                 .build();
 
             eventGateway.publish(tripReservationFailedEvent);
-            commandGateway.send(cancelHotelReservation);
             commandGateway.send(cancelTripReservation);
         } else if(event.getStatus() == ReservationEventType.CANCELLED){
             transportStatus = ReservationEventType.CANCELLED;
-            final var cancelHotelReservation = CancelHotelReservationCommand.builder()
-                .withTripReservationId(event.getTripReservationId())
-                .build();
+            if(!hotelStatus.equals(ReservationEventType.CANCELLED)){
+                final var cancelHotelReservation = CancelHotelReservationCommand.builder()
+                    .withTripReservationId(event.getTripReservationId())
+                    .build();
+                commandGateway.send(cancelHotelReservation);
+            }
+
             final var cancelTripReservation = CancelReservationCommand.builder()
                 .withTripReservationId(event.getTripReservationId())
                 .build();
@@ -202,7 +213,6 @@ public class ReserveTripSaga {
                 .build();
 
             eventGateway.publish(tripReservationFailedEvent);
-            commandGateway.send(cancelHotelReservation);
             commandGateway.send(cancelTripReservation);
         }else if(event.getStatus() == ReservationEventType.CREATED){
             transportStatus = ReservationEventType.CREATED;
@@ -255,5 +265,24 @@ public class ReserveTripSaga {
 
         commandGateway.send(confirmTransportReservationCommand);
         commandGateway.send(confirmHotelReservationCommand);
+    }
+
+    @SagaEventHandler(associationProperty = "tripReservationId")
+    public void on(final PaymentFailedEvent event){
+        log.info("Payment failed for trip reservation {}", event.getTripReservationId());
+
+        final var cancelHotelReservationCommand = CancelHotelReservationCommand.builder()
+            .withTripReservationId(event.getTripReservationId())
+            .build();
+        final var cancelTransportReservationCommand = CancelTransportReservationCommand.builder()
+            .withTripReservationId(event.getTripReservationId())
+            .build();
+        final var cancelTripReservationCommand = CancelReservationCommand.builder()
+            .withTripReservationId(event.getTripReservationId())
+            .build();
+
+        commandGateway.send(cancelHotelReservationCommand);
+        commandGateway.send(cancelTransportReservationCommand);
+        commandGateway.send(cancelTripReservationCommand);
     }
 }

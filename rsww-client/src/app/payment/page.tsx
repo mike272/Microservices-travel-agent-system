@@ -39,17 +39,14 @@ export default function Payment() {
   );
   const numberOfGuests = numberOfAdults + numberOfChildren + numberOfInfants;
   const [isLoading, setIsLoading] = useState(false);
-  console.log({
-    selectedOutBoundFlight,
-    selectedReturnFlight,
-    selectedHotel,
-  });
 
   const lengthOfStay =
-    Math.ceil(
-      (selectedReturnFlight?.departureDate?.getTime() -
-        selectedOutBoundFlight?.departureDate?.getTime()) /
-        (1000 * 60 * 60 * 24)
+    Math.abs(
+      Math.ceil(
+        (new Date(selectedReturnFlight?.departureDate).getTime() -
+          new Date(selectedOutBoundFlight?.departureDate).getTime()) /
+          (1000 * 60 * 60 * 24)
+      )
     ) ?? 5;
 
   useEffect(() => {
@@ -67,10 +64,12 @@ export default function Payment() {
 
     return `${day}/${month}/${year}`;
   };
-  console.log({
-    reservationStatus,
-  });
 
+  const price =
+    (selectedHotel?.minPrice ?? 100) * lengthOfStay +
+    numberOfGuests * (selectedOutBoundFlight?.basePrice ?? 300) +
+    numberOfGuests * (selectedReturnFlight?.basePrice ?? 400);
+  debugger;
   return (
     <div>
       <h1>Payment</h1>
@@ -88,20 +87,20 @@ export default function Payment() {
         <div>Hotel Price: {selectedHotel?.minPrice ?? 100 * lengthOfStay}</div>
         <div>
           Total Price:{" "}
-          {selectedHotel?.minPrice ??
-            100 * lengthOfStay +
-              numberOfGuests * selectedOutBoundFlight?.basePrice ??
-            300 + numberOfGuests * selectedReturnFlight?.basePrice ??
-            400}
+          {(selectedHotel?.minPrice ?? 100) * lengthOfStay +
+            numberOfGuests * (selectedOutBoundFlight?.basePrice ?? 300) +
+            numberOfGuests * (selectedReturnFlight?.basePrice ?? 400)}
         </div>
       </Card>
-      <Card title="Payment" style={{ width: 300 }}>
-        <div>
-          Your reservation is created for 180 seconds. Reservation id:{" "}
-          {tripReservationId}
-        </div>
-        <div>Please pay within 180 seconds to confirm your reservation.</div>
-      </Card>
+      {reservationStatus === "CREATED" && (
+        <Card title="Payment" style={{ width: 300 }}>
+          <div>
+            Your reservation is created for 180 seconds. Reservation id:{" "}
+            {tripReservationId}
+          </div>
+          <div>Please pay within 180 seconds to confirm your reservation.</div>
+        </Card>
+      )}
       <Button
         type="primary"
         loading={isLoading}
