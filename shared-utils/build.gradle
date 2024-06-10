@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'com.rsww'
-version = '0.1-SNAPSHOT'
+version = '1.0'
 
 repositories {
     mavenCentral()
@@ -30,5 +30,27 @@ jar {
     manifest {
         attributes 'Implementation-Title': 'shared-utils',
                    'Implementation-Version': version
+    }
+}
+
+plugins{
+    id 'java'
+    id 'maven-publish'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            url "http://my.artifactory.com/artifactory/libs-release-local" // replace with your repository url
+            credentials {
+                username = 'myUser' // replace with your username
+                password = 'myPassword' // replace with your password
+            }
+        }
     }
 }
