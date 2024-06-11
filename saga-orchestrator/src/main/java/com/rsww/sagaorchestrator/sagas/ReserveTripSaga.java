@@ -62,7 +62,7 @@ public class ReserveTripSaga {
         final var receivedTripData = command.getTrip();
 //        this is start of saga. It is triggered by frontend and results in reserving transport and hotel
         SagaLifecycle.associateWith("tripReservationId", receivedTripData.getId());
-        customerId = event.getCustomerId();
+        customerId = command.getCustomerId();
         final var hotelCommand = ReserveHotelCommand.builder()
             .withTripReservationId(receivedTripData.getId())
             .withCustomerId(receivedTripData.getCustomerId())
