@@ -54,6 +54,7 @@ public class ReserveTripSaga {
 
     private ReservationEventType hotelStatus;
     private ReservationEventType transportStatus;
+    private int customerId;
 
     @StartSaga
     @SagaEventHandler(associationProperty = "tripReservationId")
@@ -61,6 +62,7 @@ public class ReserveTripSaga {
         final var receivedTripData = command.getTrip();
 //        this is start of saga. It is triggered by frontend and results in reserving transport and hotel
         SagaLifecycle.associateWith("tripReservationId", receivedTripData.getId());
+        customerId = event.getCustomerId();
         final var hotelCommand = ReserveHotelCommand.builder()
             .withTripReservationId(receivedTripData.getId())
             .withCustomerId(receivedTripData.getCustomerId())
@@ -142,6 +144,7 @@ public class ReserveTripSaga {
                     .withTripReservationId(event.getTripReservationId())
                     .withLocation(event.getLocation())
                     .withDates(event.getDates())
+                    .withCustomerId(customerId)
                     .build();
                 final UpdateTripStatusCommand updateTripStatus = UpdateTripStatusCommand.builder()
                     .withTripReservationId(event.getTripReservationId())
@@ -158,6 +161,7 @@ public class ReserveTripSaga {
                     .withTripReservationId(event.getTripReservationId())
                     .withLocation(event.getLocation())
                     .withDates(event.getDates())
+                    .withCustomerId(customerId)
                     .build();
                 final var updateTripStatus = UpdateTripStatusCommand.builder()
                     .withTripReservationId(event.getTripReservationId())
@@ -221,6 +225,7 @@ public class ReserveTripSaga {
                     .withTripReservationId(event.getTripReservationId())
                     .withLocation(event.getLocation())
                     .withDates(event.getDates())
+                    .withCustomerId(customerId)
                     .build();
                 final var updateTripStatus = UpdateTripStatusCommand.builder()
                     .withTripReservationId(event.getTripReservationId())
@@ -236,6 +241,7 @@ public class ReserveTripSaga {
                 final var allReservationsConfirmedEvent = AllReservationsConfirmedEvent.builder()
                     .withTripReservationId(event.getTripReservationId())
                     .withLocation(event.getLocation())
+                    .withCustomerId(customerId)
                     .withDates(event.getDates())
                     .build();
 

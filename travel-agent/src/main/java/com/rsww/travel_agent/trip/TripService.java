@@ -92,6 +92,7 @@ public class TripService
         final var savedTrip = tripRepository.save(domainTrip);
         eventGateway.publish(TripCreatedEvent.builder()
             .withLocation(trip.getLocation())
+            .withCustomerId(trip.getCustomerId())
             .withDates(trip.getOutboundDate().toString() + " - " + trip.getReturnDate().toString())
             .withTrip(mapToTripDTO(savedTrip)).build());
         return savedTrip;

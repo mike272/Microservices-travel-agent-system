@@ -14,4 +14,5 @@ public class Message
     private String type;
     private int tripReservationId;
     private ReservationEventType status;
+    private int customerId;
 }

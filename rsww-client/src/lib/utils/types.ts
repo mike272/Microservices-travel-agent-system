@@ -45,6 +45,7 @@ type EventType = {
   type: "INFO" | "SUCCESS" | "ERROR" | "WARNING";
   tripReservationId: number;
   status: string;
+  customerId: number;
 };
 
 export type { Trip, Hotel, Transportation, EventType, Room };

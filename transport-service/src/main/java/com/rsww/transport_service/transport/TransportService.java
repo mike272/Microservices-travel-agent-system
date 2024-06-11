@@ -86,7 +86,7 @@ public class TransportService
 
     public void initializeTransports() throws IOException
     {
-        final Reader reader = Files.newBufferedReader(Paths.get("./src/main/java/com/rsww/transport_service/transport/scrapTransport.csv"));
+        final Reader reader = Files.newBufferedReader(Paths.get("/app/scrapTransport.csv"));
         final CsvToBean<Transport> csvToBean = new CsvToBeanBuilder<Transport>(reader)
             .withType(Transport.class)
             .withFilter(line -> Arrays.stream(line).allMatch(s -> s != null && !s.isEmpty() && !s.equals("NULL")))

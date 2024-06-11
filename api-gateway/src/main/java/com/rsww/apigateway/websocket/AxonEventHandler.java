@@ -99,6 +99,7 @@ public class AxonEventHandler
         final Message message = Message
             .builder()
             .withTripReservationId(event.getTripReservationId())
+            .withCustomerId(event.getCustomerId())
             .withType("SUCCESS")
             .withStatus(ReservationEventType.CONFIRMED)
             .withTextContent("Both hotel and transport reservations for trip " + event.getTripReservationId() + " to " + event.getLocation() + " on "
@@ -113,6 +114,7 @@ public class AxonEventHandler
         final Message message = Message
             .builder()
             .withTripReservationId(event.getTripReservationId())
+            .withCustomerId(event.getCustomerId())
             .withType("SUCCESS")
             .withStatus(ReservationEventType.CREATED)
             .withTextContent("Both hotel and transport reservations for trip " + event.getTripReservationId() + " to " + event.getLocation() + " on "

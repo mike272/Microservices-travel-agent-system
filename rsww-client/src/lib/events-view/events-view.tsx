@@ -54,8 +54,9 @@ const EventsView = () => {
             const eventData = JSON.parse(message.body) as EventType;
 
             if (
-              eventData?.tripReservationId === localBookingId ||
-              eventData?.tripReservationId === localBookingId - 1
+              // eventData?.tripReservationId === localBookingId ||
+              // eventData?.tripReservationId === localBookingId - 1 ||
+              eventData?.customerId !== 200
               // ||
               // true
             ) {
@@ -161,6 +162,7 @@ const EventsView = () => {
                 textContent={event.textContent}
                 tripReservationId={event?.tripReservationId}
                 status={event?.status}
+                customerId={event?.customerId}
               />
             ))}
       </div>

@@ -65,7 +65,7 @@ public class HotelService
 
     public void initializeHotelsDatabase() throws IOException
     {
-        final Reader reader = Files.newBufferedReader(Paths.get("./src/main/java/com/rsww/hotelService/hotel/scrapHotel.csv"));
+        final Reader reader = Files.newBufferedReader(Paths.get("/app/scrapHotel.csv"));
         final CsvToBean<Hotel> csvToBean = new CsvToBeanBuilder<Hotel>(reader)
             .withType(Hotel.class)
             .withIgnoreLeadingWhiteSpace(true)
