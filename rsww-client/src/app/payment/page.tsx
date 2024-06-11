@@ -65,11 +65,6 @@ export default function Payment() {
     return `${day}/${month}/${year}`;
   };
 
-  const price =
-    (selectedHotel?.minPrice ?? 100) * lengthOfStay +
-    numberOfGuests * (selectedOutBoundFlight?.basePrice ?? 300) +
-    numberOfGuests * (selectedReturnFlight?.basePrice ?? 400);
-  debugger;
   return (
     <div>
       <h1>Payment</h1>

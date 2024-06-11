@@ -6,7 +6,7 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: postgres
     ports:
-      - 2345:2345
+      - 5432:5432
 
 
   axonserver:
@@ -17,75 +17,75 @@ services:
       - 8024:8024
       - 8124:8124
 
-  travel-agent:
-    image: mike272/travel-agent
-    ports:
-      - 8081:8081
-    depends_on:
-      - postgres
-      - axonserver
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:2345/postgres
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=password
-      - AXON_AXONSERVER_SERVERS=axon
-
-  hotel-service:
-    image: mike272/hotel-service
-    ports:
-      - 8082:8082
-    depends_on:
-      - postgres
-      - axonserver
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:2345/postgres
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=password
-      - AXON_AXONSERVER_SERVERS=axon
-
-  transport-service:
-    image: mike272/transport-service
-    ports:
-      - 8083:8083
-    depends_on:
-      - postgres
-      - axonserver
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:2345/postgres
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=password
-      - AXON_AXONSERVER_SERVERS=axon
-
-  api-gateway:
-    image: mike272/api-gateway
-    ports:
-      - 9999:9999
-    depends_on:
-      - postgres
-      - axonserver
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:2345/postgres
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=password
-      - AXON_AXONSERVER_SERVERS=axon
-
-  saga-orchestrator:
-    image: mike272/saga-orchestrator
-    ports:
-      - 8085:8085
-    depends_on:
-      - postgres
-      - axonserver
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:2345/postgres
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=password
-      - AXON_AXONSERVER_SERVERS=axon
-
-  rsww-client:
-    image: mike272/rsww-client
-    ports:
-      - 3000:3000
+#  travel-agent:
+#    image: mike272/travel-agent
+#    ports:
+#      - 8081:8081
+#    depends_on:
+#      - postgres
+#      - axonserver
+#    environment:
+#      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:2345/postgres
+#      - SPRING_DATASOURCE_USERNAME=postgres
+#      - SPRING_DATASOURCE_PASSWORD=password
+#      - AXON_AXONSERVER_SERVERS=axon
+#
+#  hotel-service:
+#    image: mike272/hotel-service
+#    ports:
+#      - 8082:8082
+#    depends_on:
+#      - postgres
+#      - axonserver
+#    environment:
+#      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:2345/postgres
+#      - SPRING_DATASOURCE_USERNAME=postgres
+#      - SPRING_DATASOURCE_PASSWORD=password
+#      - AXON_AXONSERVER_SERVERS=axon
+#
+#  transport-service:
+#    image: mike272/transport-service
+#    ports:
+#      - 8083:8083
+#    depends_on:
+#      - postgres
+#      - axonserver
+#    environment:
+#      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:2345/postgres
+#      - SPRING_DATASOURCE_USERNAME=postgres
+#      - SPRING_DATASOURCE_PASSWORD=password
+#      - AXON_AXONSERVER_SERVERS=axon
+#
+#  api-gateway:
+#    image: mike272/api-gateway
+#    ports:
+#      - 9999:9999
+#    depends_on:
+#      - postgres
+#      - axonserver
+#    environment:
+#      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:2345/postgres
+#      - SPRING_DATASOURCE_USERNAME=postgres
+#      - SPRING_DATASOURCE_PASSWORD=password
+#      - AXON_AXONSERVER_SERVERS=axon
+#
+#  saga-orchestrator:
+#    image: mike272/saga-orchestrator
+#    ports:
+#      - 8085:8085
+#    depends_on:
+#      - postgres
+#      - axonserver
+#    environment:
+#      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:2345/postgres
+#      - SPRING_DATASOURCE_USERNAME=postgres
+#      - SPRING_DATASOURCE_PASSWORD=password
+#      - AXON_AXONSERVER_SERVERS=axon
+#
+#  rsww-client:
+#    image: mike272/rsww-client
+#    ports:
+#      - 2727:2727
 
 
   # payment-service:

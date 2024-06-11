@@ -55,8 +55,9 @@ const EventsView = () => {
 
             if (
               eventData?.tripReservationId === localBookingId ||
-              eventData?.tripReservationId === localBookingId - 1 ||
-              true
+              eventData?.tripReservationId === localBookingId - 1
+              // ||
+              // true
             ) {
               if (eventData.status === "PAID") {
                 notification.open({
@@ -151,15 +152,17 @@ const EventsView = () => {
           {isToggled ? ">>" : "<<"}
         </Button>
         {isToggled &&
-          events.map((event, index) => (
-            <EventRow
-              key={index}
-              type={event.type}
-              textContent={event.textContent}
-              tripReservationId={event?.tripReservationId}
-              status={event?.status}
-            />
-          ))}
+          events
+            .reverse()
+            .map((event, index) => (
+              <EventRow
+                key={index}
+                type={event.type}
+                textContent={event.textContent}
+                tripReservationId={event?.tripReservationId}
+                status={event?.status}
+              />
+            ))}
       </div>
     );
   }

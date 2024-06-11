@@ -95,7 +95,7 @@ public class ReserveTripSaga {
         if (event.getStatus() == ReservationEventType.FAILED) {
             hotelStatus = ReservationEventType.FAILED;
 
-            if(!transportStatus.equals(ReservationEventType.FAILED)){
+            if(transportStatus !=null && transportStatus.equals(ReservationEventType.FAILED)){
                 final var cancelTransportReservation = CancelTransportReservationCommand.builder()
                     .withTripReservationId(event.getTripReservationId())
                     .build();
@@ -116,7 +116,7 @@ public class ReserveTripSaga {
         } else if(event.getStatus() == ReservationEventType.CANCELLED){
             hotelStatus = ReservationEventType.CANCELLED;
 
-            if(!transportStatus.equals(ReservationEventType.CANCELLED)){
+            if(transportStatus !=null && !transportStatus.equals(ReservationEventType.CANCELLED)){
                 final var cancelTransportReservation = CancelTransportReservationCommand.builder()
                     .withTripReservationId(event.getTripReservationId())
                     .build();
@@ -175,7 +175,7 @@ public class ReserveTripSaga {
     public void on(final TransportReservationEvent event) {
         if (event.getStatus() == ReservationEventType.FAILED) {
             transportStatus = ReservationEventType.FAILED;
-            if(!hotelStatus.equals(ReservationEventType.FAILED)){
+            if(hotelStatus !=null && !hotelStatus.equals(ReservationEventType.FAILED)){
                 final var cancelHotelReservation = CancelHotelReservationCommand.builder()
                     .withTripReservationId(event.getTripReservationId())
                     .build();
@@ -196,7 +196,7 @@ public class ReserveTripSaga {
             commandGateway.send(cancelTripReservation);
         } else if(event.getStatus() == ReservationEventType.CANCELLED){
             transportStatus = ReservationEventType.CANCELLED;
-            if(!hotelStatus.equals(ReservationEventType.CANCELLED)){
+            if(hotelStatus!=null &&!hotelStatus.equals(ReservationEventType.CANCELLED)){
                 final var cancelHotelReservation = CancelHotelReservationCommand.builder()
                     .withTripReservationId(event.getTripReservationId())
                     .build();
